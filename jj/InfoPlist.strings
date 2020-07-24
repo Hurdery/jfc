@@ -1,0 +1,10 @@
+/* 
+  InfoPlist.strings
+  jj
+
+  Created by LY_MD on 2020/7/22.
+  Copyright © 2020 LY_MD. All rights reserved.
+*/
+CFBundleName = "基富贵贵贵贵";// 在状态栏中显示
+
+CFBundleDisplayName = "贵";// 在 docker 栏及应用中显示
