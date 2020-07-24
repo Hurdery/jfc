@@ -12,8 +12,31 @@
 
 - (void)drawRect:(NSRect)dirtyRect {
     [super drawRect:dirtyRect];
-    
-    // Drawing code here.
 }
+- (NSMenu *)menuForEvent:(NSEvent *)event{
+    
+    if (event.type == NSEventTypeRightMouseDown) {
+        NSPoint menuPoint = [self convertPoint:[event locationInWindow] fromView:nil];
+        NSInteger row = [self rowAtPoint:menuPoint];
+         if (row >= 0) {
+           NSMenu * menu = [[NSMenu alloc]initWithTitle:@"Menu"];
+           NSMenuItem * item1 = [[NSMenuItem alloc]initWithTitle:@"删除" action:@selector(menuDelete:) keyEquivalent:@""];
+           item1.tag = row;
+           item1.target = self;
+           [menu addItem:item1];
+           return menu;
+        }
 
+    }
+    
+    return nil;
+    
+}
+- (void)menuDelete:(NSMenuItem *)item {
+    
+    if ([self.mhdelegate respondsToSelector:@selector(tableView:didClickMenuDelete:)]) {
+        [self.mhdelegate tableView:self didClickMenuDelete:item.tag];
+    }
+    
+}
 @end

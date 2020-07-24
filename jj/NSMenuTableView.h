@@ -8,10 +8,13 @@
 
 #import <Cocoa/Cocoa.h>
 
-NS_ASSUME_NONNULL_BEGIN
+@protocol MenuHandleDelegate <NSObject>
 
-@interface NSMenuTableView : NSTableView
+- (void)tableView:(NSTableView *)tableView didClickMenuDelete:(NSInteger)row;
 
 @end
 
-NS_ASSUME_NONNULL_END
+@interface NSMenuTableView : NSTableView
+@property(nonatomic,weak)id <MenuHandleDelegate>mhdelegate;
+@end
+
