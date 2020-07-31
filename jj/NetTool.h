@@ -12,7 +12,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NetTool : NSObject
+
 + (void)getFundInfo:(NSString *)code complete:(void(^)(id resp))resp;
+
++ (void)getIndexInfo:(void(^)(id resp))resp;
+
+
 @end
 
 NS_ASSUME_NONNULL_END

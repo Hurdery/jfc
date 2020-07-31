@@ -10,14 +10,14 @@
 #import "AlertTool.h"
 #import "DataManager.h"
 
+#define GREENCOLOR [NSColor colorWithDeviceRed:140/255.0 green:212/255.0 blue:144/255.0 alpha:1]
+
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
     [self UISet];
     [self loadData];
-    
 }
 - (void)UISet {
     
@@ -26,7 +26,54 @@
     self.codeTableV.mhdelegate = self;
     
 }
+- (void)configureUI:(NSArray <FundModel *>*)ary {
+    
+    //上证指数
+    FundModel *szhm = ary[0];
+    //沪深300
+    FundModel *hsm = ary[1];
+    //深证成指
+    FundModel *scm = ary[2];
 
+    self.shangLabel.stringValue = szhm.f2;
+    self.huLabel.stringValue = hsm.f2;
+    self.shenLabel.stringValue = scm.f2;
+    self.shang1Label.stringValue = szhm.f4;
+    self.hu1Label.stringValue = hsm.f4;
+    self.shen1Label.stringValue = scm.f4;
+    
+    
+    if ([szhm.f3 containsString:@"-"]) {
+        self.shangLabel.textColor = GREENCOLOR;
+        self.shang1Label.textColor = GREENCOLOR;
+        self.shangImage.image = [NSImage imageNamed:@"down"];
+    } else {
+        self.shangLabel.textColor = [NSColor redColor];
+        self.shang1Label.textColor = [NSColor redColor];
+        self.shangImage.image = [NSImage imageNamed:@"up"];
+    }
+    if ([hsm.f3 containsString:@"-"]) {
+           self.huLabel.textColor = GREENCOLOR;
+           self.hu1Label.textColor = GREENCOLOR;
+           self.huImage.image = [NSImage imageNamed:@"down"];
+    } else {
+           self.huLabel.textColor = [NSColor redColor];
+           self.hu1Label.textColor = [NSColor redColor];
+           self.huImage.image = [NSImage imageNamed:@"up"];
+    }
+    if ([scm.f3 containsString:@"-"]) {
+           self.shenLabel.textColor = GREENCOLOR;
+           self.shen1Label.textColor = GREENCOLOR;
+           self.shenImage.image = [NSImage imageNamed:@"down"];
+
+    } else {
+           self.huLabel.textColor = [NSColor redColor];
+           self.shen1Label.textColor = [NSColor redColor];
+           self.shenImage.image = [NSImage imageNamed:@"up"];
+
+    }
+    
+}
 - (IBAction)resetClick:(id)sender {
     
     [AlertTool showAlert:@"数据将恢复至默认基金排行榜（天天基金榜十，跟着榜单走，没准能吃到基肉哦）" actionTitle1:@"好的" actionTitle2:@"取消" window:[self.view window] action:^(AlertResponse resp) {
@@ -77,7 +124,7 @@
     
         [self refreshData];
     
-         dispatch_queue_t queue = dispatch_get_main_queue();
+        dispatch_queue_t queue = dispatch_get_main_queue();
          
           dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
        
@@ -88,13 +135,18 @@
           });
           
           self.timer = timer;
-
+  
     
 }
 - (void)refreshData {
     [[DataManager manger]loadData:^(id  _Nonnull resp) {
           self.modelsAry = resp;
           [self.codeTableV reloadData];
+    }];
+    [NetTool getIndexInfo:^(NSArray <FundModel *>*mArray) {
+            
+           [self configureUI:mArray];
+                   
     }];
 }
 
@@ -114,7 +166,7 @@
         NSTableCellView *cell = [tableView makeViewWithIdentifier:@"cell2" owner:nil];
         cell.textField.stringValue = model.gszzl;
         if ([model.gszzl containsString:@"-"]) {
-            cell.textField.textColor = [NSColor greenColor];
+            cell.textField.textColor = GREENCOLOR;
         }else {
             cell.textField.textColor = [NSColor redColor];
         }

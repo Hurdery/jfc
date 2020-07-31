@@ -25,6 +25,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// 基序
 @property(nonatomic,assign)NSInteger sort;
 
+
+/// 指数
+@property(nonatomic,copy)NSString *f2;
+@property(nonatomic,copy)NSString *f3;
+@property(nonatomic,copy)NSString *f4;
+
+
 - (instancetype)initWithDic:(NSDictionary *)dic;
 
 @end

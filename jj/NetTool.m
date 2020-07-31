@@ -14,7 +14,7 @@
 
 @implementation NetTool
 + (void)getFundInfo:(NSString *)code complete:(void(^)(id resp))resp {
-    AFHTTPSessionManager *mgr = [AFHTTPSessionManager manager];
+      AFHTTPSessionManager *mgr = [AFHTTPSessionManager manager];
       mgr.requestSerializer = [AFHTTPRequestSerializer serializer];
       mgr.responseSerializer = [AFHTTPResponseSerializer serializer];
       mgr.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/x-javascript",nil];
@@ -27,13 +27,37 @@
              FundModel *fm = [[FundModel alloc]initWithDic:dic];
              resp(fm);
           }
-          NSLog(@"responseObject===%@",string);
+//          NSLog(@"responseObject===%@",string);
       } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
 //          NSLog(@"NSError===%@",error);
           resp(error);
       }];
     
 }
+
++ (void)getIndexInfo:(void(^)(id resp))resp {
+    
+          AFHTTPSessionManager *mgr = [AFHTTPSessionManager manager];
+          mgr.requestSerializer = [AFHTTPRequestSerializer serializer];
+          mgr.responseSerializer = [AFJSONResponseSerializer serializer];
+          mgr.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json",nil];
+          [mgr GET:@"https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f2,f3,f4,f12,f14&secids=1.000001,1.000300,0.399001" parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {              NSLog(@"responseObject===%@",responseObject);
+              
+              NSArray *diffA = responseObject[@"data"][@"diff"];
+              NSMutableArray *diffM = [NSMutableArray array];
+              [diffA enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                  FundModel *fm = [[FundModel alloc]initWithDic:obj];
+                  [diffM addObject:fm];
+              }];
+              resp(diffM);
+            } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+              NSLog(@"NSError===%@",error);
+              resp(error);
+          }];
+    
+    
+}
+
 + (NSDictionary *)dictionaryWithJsonString:(NSString *)jsonString
 {
     if (jsonString == nil) {
