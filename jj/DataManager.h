@@ -15,6 +15,12 @@ typedef enum : NSUInteger {
     AlertNull,
 } AlertType;
 
+typedef enum : NSUInteger {
+    RecommedType, // 自选 + 推荐的数据
+    OtherType, // 自定义，如自己持仓部分
+} SourceType;
+
+/// <#Description#>
 @interface DataManager : NSObject
 
 /// 模型数据
@@ -25,22 +31,27 @@ typedef enum : NSUInteger {
 
 /// 加载数据
 /// @param resp <#resp description#>
-- (void)loadData:(void(^)(id resp))resp;
+- (void)loadData:(SourceType)st resp:(void(^)(id resp))resp;
 
 /// 添加数据
 /// @param codeStr <#codeStr description#>
 /// @param result <#result description#>
-- (void)addData:(NSString *)codeStr resp:(void(^)(id result,AlertType at))result;
+- (void)addData:(NSString *)codeStr source:(SourceType)st resp:(void(^)(id result,AlertType at))result;
 
 /// 删除数据
 /// @param resp <#resp description#>
-- (void)deleteData:(NSInteger)row resp:(void(^)(id resp))resp;
+- (void)deleteData:(NSInteger)row source:(SourceType)st resp:(void(^)(id resp))resp;
 
 /// 清楚数据
 - (void)clearData;
 
 /// 重置数据
-- (void)resetDefaultData:(void(^)(id resp))resp;
+- (void)resetDefaultData:(SourceType)st resp:(void(^)(id resp))resp;
 
+
+/// 拖拽后，重排数据
+/// @param st <#st description#>
+/// @param modelsAry <#modelsAry description#>
+- (void)dragReset:(SourceType)st modelsAry:(NSArray *)modelsAry;
 @end
 

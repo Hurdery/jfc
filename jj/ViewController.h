@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "NetTool.h"
+#import "DataManager.h"
 #import "NSMenuTableView.h"
 
 @interface ViewController : NSViewController<NSTabViewDelegate,NSTableViewDataSource,MenuHandleDelegate>
@@ -24,7 +24,7 @@
 @property (weak) IBOutlet NSImageView *huImage;
 @property (weak) IBOutlet NSImageView *shangImage;
 @property (weak) IBOutlet NSImageView *shenImage;
-
+@property(nonatomic,assign) SourceType st;
 
 
 @property (nonatomic, strong) dispatch_source_t timer;

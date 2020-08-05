@@ -8,7 +8,6 @@
 
 #import "ViewController.h"
 #import "AlertTool.h"
-#import "DataManager.h"
 
 #define GREENCOLOR [NSColor colorWithDeviceRed:140/255.0 green:212/255.0 blue:144/255.0 alpha:1]
 
@@ -24,8 +23,13 @@
     self.codeTableV.delegate = (id)self;
     self.codeTableV.dataSource = self;
     self.codeTableV.mhdelegate = self;
-    
+
+    [self.codeTableV registerForDraggedTypes:@[NSPasteboardTypeString]];
+    self.codeTableV.draggingDestinationFeedbackStyle = NSTableViewDraggingDestinationFeedbackStyleSourceList;
+
+    _st = RecommedType;
 }
+
 - (void)configureUI:(NSArray <FundModel *>*)ary {
     
     //上证指数
@@ -70,7 +74,6 @@
            self.huLabel.textColor = [NSColor redColor];
            self.shen1Label.textColor = [NSColor redColor];
            self.shenImage.image = [NSImage imageNamed:@"up"];
-
     }
     
 }
@@ -78,19 +81,18 @@
     
     [AlertTool showAlert:@"数据将恢复至默认基金排行榜（天天基金榜十，跟着榜单走，没准能吃到基肉哦）" actionTitle1:@"好的" actionTitle2:@"取消" window:[self.view window] action:^(AlertResponse resp) {
         if (resp == FirstResp) {
-            [[DataManager manger]resetDefaultData:^(id resp) {
+            [[DataManager manger]resetDefaultData:self->_st resp:^(id resp) {
                 [self refreshData];
             }];
         }
     }];
     
 }
-
 - (IBAction)addClick:(id)sender {
     
     NSString *codeStr = self.codeTf.stringValue;
     
-    [[DataManager manger]addData:codeStr resp:^(id  _Nonnull result, AlertType at) {
+    [[DataManager manger]addData:codeStr source:_st resp:^(id  _Nonnull result, AlertType at) {
         
         if (at == AlertEmpty) {
             [AlertTool showAlert:@"别点了，鼠标好使！" actionTitle1:@"输入基码" actionTitle2:nil window:[self.view window] action:nil];
@@ -120,6 +122,20 @@
 - (IBAction)refreshClick:(id)sender {
     [self refreshData];
 }
+- (IBAction)changeSource:(NSButton *)sender {
+    
+    sender.accessibilitySelected = !sender.accessibilitySelected;
+       if (sender.accessibilitySelected) {
+          _st = OtherType;
+          sender.title = @"自选源";
+       }else{
+        _st = RecommedType;
+        sender.title = @"推荐源";
+       }
+       [self refreshData];
+
+}
+
 - (void)loadData {
     
         [self refreshData];
@@ -139,7 +155,7 @@
     
 }
 - (void)refreshData {
-    [[DataManager manger]loadData:^(id  _Nonnull resp) {
+    [[DataManager manger]loadData:_st resp:^(id  _Nonnull resp) {
           self.modelsAry = resp;
           [self.codeTableV reloadData];
     }];
@@ -159,11 +175,18 @@
     FundModel *model = self.modelsAry[row];
     if (tableColumn == tableView.tableColumns[0]) {
         NSTableCellView *cell = [tableView makeViewWithIdentifier:@"cell1" owner:nil];
-        cell.textField.stringValue = model.name;
+        cell.textField.stringValue = [NSString stringWithFormat:@"%@(%@)",model.name,model.fundcode];
         return cell;
-
     }else if (tableColumn == tableView.tableColumns[1]) {
+        NSTableCellView *cell = [tableView makeViewWithIdentifier:@"cell1" owner:nil];
+        cell.textField.stringValue = model.dwjz;
+        return cell;
+    }else if (tableColumn == tableView.tableColumns[2]) {
         NSTableCellView *cell = [tableView makeViewWithIdentifier:@"cell2" owner:nil];
+        cell.textField.stringValue = model.gsz;
+        return cell;
+    }else if (tableColumn == tableView.tableColumns[3]) {
+        NSTableCellView *cell = [tableView makeViewWithIdentifier:@"cell3" owner:nil];
         cell.textField.stringValue = model.gszzl;
         if ([model.gszzl containsString:@"-"]) {
             cell.textField.textColor = GREENCOLOR;
@@ -171,13 +194,52 @@
             cell.textField.textColor = [NSColor redColor];
         }
         return cell;
-
     }else{
         NSTableCellView *cell = [tableView makeViewWithIdentifier:@"cell3" owner:nil];
         cell.textField.stringValue = model.gztime;
         return cell;
     }
   
+}
+- (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
+{
+    NSData *indexSetData = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes requiringSecureCoding:YES error:nil];
+    
+    [pboard declareTypes:@[NSPasteboardTypeString] owner:self];
+    [pboard setData:indexSetData forType:NSPasteboardTypeString];
+
+    return YES;
+}
+
+- (NSDragOperation)tableView:(NSTableView *)tableView validateDrop:(id<NSDraggingInfo>)info proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)dropOperation
+{
+    if (dropOperation == NSTableViewDropAbove) {
+        return NSDragOperationMove;
+    }
+    return NSDragOperationNone;
+}
+- (BOOL)tableView:(NSTableView *)tableView acceptDrop:(id<NSDraggingInfo>)info row:(NSInteger)row dropOperation:(NSTableViewDropOperation)dropOperation
+{
+    NSPasteboard *pboard = [info draggingPasteboard];
+    NSData* rowData = [pboard dataForType:NSPasteboardTypeString];
+    NSIndexSet* rowIndexes = [NSKeyedUnarchiver unarchivedObjectOfClass:[NSIndexSet class] fromData:rowData error:nil];
+    NSInteger sourceRow = rowIndexes.firstIndex;
+    
+    if (sourceRow < row) {
+        // 从上往下移
+          [self.modelsAry insertObject:[self.modelsAry objectAtIndex:sourceRow] atIndex:row];
+           [self.modelsAry removeObjectAtIndex:sourceRow];
+           [self.codeTableV reloadData];
+        [[DataManager manger]dragReset:_st modelsAry:self.modelsAry];
+           return YES;
+    }else {
+        FundModel *smodel = [self.modelsAry objectAtIndex:sourceRow];
+        [self.modelsAry removeObjectAtIndex:sourceRow];
+        [self.modelsAry insertObject:smodel atIndex:row];
+        [self.codeTableV reloadData];
+        [[DataManager manger]dragReset:_st modelsAry:self.modelsAry];
+        return YES;
+    }
 }
 
 - (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {
@@ -189,7 +251,7 @@
 }
 - (void)tableView:(NSTableView *)tableView didClickMenuDelete:(NSInteger)row {
     NSLog(@"didClickMenuDelete===%ld",(long)row);
-    [[DataManager manger]deleteData:row resp:^(id resp) {
+    [[DataManager manger]deleteData:row source:_st resp:^(id resp) {
         [self refreshData];
     }];
 }

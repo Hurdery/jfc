@@ -20,11 +20,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic,copy)NSString *gztime;
 /// 基时
 @property(nonatomic,copy)NSString *jzrq;
+/// 基净
+@property(nonatomic,copy)NSString *dwjz;
+/// 基估
+@property(nonatomic,copy)NSString *gsz;
 /// 基名
 @property(nonatomic,copy)NSString *name;
 /// 基序
 @property(nonatomic,assign)NSInteger sort;
-
 
 /// 指数
 @property(nonatomic,copy)NSString *f2;

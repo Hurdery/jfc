@@ -27,7 +27,7 @@
              FundModel *fm = [[FundModel alloc]initWithDic:dic];
              resp(fm);
           }
-//          NSLog(@"responseObject===%@",string);
+          NSLog(@"responseObject===%@",string);
       } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
 //          NSLog(@"NSError===%@",error);
           resp(error);
