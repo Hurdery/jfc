@@ -1,17 +1,25 @@
 # jfc
-Mac端基金管理查看平台（数据来源天天基金）
+苹果Mac端基金管理查看平台（数据来源天天基金）
 
 ## 基金小大湿
 
-![基基](https://github.com/Hurdery/jfc/blob/master/resource/vc.png)
+#### 一览
+![基基](https://github.com/Hurdery/jfc/blob/master/resource/WechatIMG69.png)
+#### 二览
+![基基](https://github.com/Hurdery/jfc/blob/master/resource/WechatIMG70.png)
+#### 三览
+![基基](https://github.com/Hurdery/jfc/blob/master/resource/WechatIMG71.png)
+#### 四览
+![基基](https://github.com/Hurdery/jfc/blob/master/resource/WechatIMG72.png)
 
 ### 啥功能啊
 
 * 天天基金收益榜十一览
+* 自持仓位基金一览
 * 添加自选基金
 * 删除自选基金
+* 拖拽排序
 * 手动/自动刷新
-* 自己量身定制页面
 * 最后你以为我是闲的？目前找半天没有那个mac端软件可以自定义添加各基购所发行基金的（有的话，请告诉我）
 
 ### 安装
@@ -22,7 +30,7 @@ Mac端基金管理查看平台（数据来源天天基金）
 
 **2. 非普通安装**
 
-* 直接跑代码或修改更好的共享最好
+* 直接跑代码
 
 ### 使用
 
@@ -40,5 +48,5 @@ Mac端基金管理查看平台（数据来源天天基金）
 
 #### 啥？听说大涨了？？😏
 
-来吧，把你的喜悦分享给大家吧
+来吧，把你的喜悦分享给大家吧！
 
