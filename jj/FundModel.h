@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic,copy)NSString *name;
 /// 基序
 @property(nonatomic,assign)NSInteger sort;
+/// 基持
+@property(nonatomic,copy)NSString *jc;
 
 /// 指数
 @property(nonatomic,copy)NSString *f2;

@@ -10,7 +10,8 @@
 #import "DataManager.h"
 #import "NSMenuTableView.h"
 
-@interface ViewController : NSViewController<NSTabViewDelegate,NSTableViewDataSource,MenuHandleDelegate>
+@interface ViewController : NSViewController<NSTabViewDelegate,NSTableViewDataSource,MenuHandleDelegate,NSTextFieldDelegate>
+
 @property (weak) IBOutlet NSTextField *codeTf;
 @property (weak) IBOutlet NSButton *addBtn;
 @property (weak) IBOutlet NSMenuTableView *codeTableV;
@@ -24,9 +25,13 @@
 @property (weak) IBOutlet NSImageView *huImage;
 @property (weak) IBOutlet NSImageView *shangImage;
 @property (weak) IBOutlet NSImageView *shenImage;
+@property (weak) IBOutlet NSTextField *totolLabel;
 @property(nonatomic,assign) SourceType st;
 
+/// 存放持仓数据
+@property (nonatomic, strong) NSMutableDictionary *ccDic;
 
+/// 自动刷新
 @property (nonatomic, strong) dispatch_source_t timer;
 
 /// 数据

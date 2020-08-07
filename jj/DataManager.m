@@ -9,6 +9,7 @@
 #import "DataManager.h"
 #define jjKey @"jjkey"
 #define jjMyKey @"jjMyKey"
+#define jcKey @"jcKey"
 
 @implementation DataManager
 
@@ -122,9 +123,7 @@
            }
            
        }];
-    
-    
-    
+        
 }
 - (void)deleteData:(NSInteger)row source:(SourceType)st resp:(void(^)(id resp))resp {
     
@@ -164,7 +163,6 @@
          resp(@"reset");
     }
     
-     
 }
 - (NSArray *)sortHomeModelArray:(NSArray *)tempAry {
     
@@ -182,18 +180,25 @@
 - (void)dragReset:(SourceType)st modelsAry:(NSArray *)modelsAry {
     
     NSMutableArray *tempAry = [NSMutableArray arrayWithCapacity:modelsAry.count];
+
     [modelsAry enumerateObjectsUsingBlock:^(FundModel *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         
         [tempAry addObject:obj.fundcode];
-        
+
     }];
     
     if (st == RecommedType) {
         [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempAry] forKey:jjKey];
     } else {
-      [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempAry] forKey:jjMyKey];
+        [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempAry] forKey:jjMyKey];
     }
     
+}
+- (void)saveInvestedMoney:(NSMutableDictionary *)mdic {
+    [[NSUserDefaults standardUserDefaults]setObject:[NSDictionary dictionaryWithDictionary:mdic] forKey:jcKey];
+}
+- (NSDictionary *)getInvestedMoney {
+    return  [[NSUserDefaults standardUserDefaults]objectForKey:jcKey];
 }
 
 @end

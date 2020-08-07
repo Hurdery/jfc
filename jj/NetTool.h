@@ -13,8 +13,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NetTool : NSObject
 
+/// 加载基金信息
+/// @param code <#code description#>
+/// @param resp <#resp description#>
 + (void)getFundInfo:(NSString *)code complete:(void(^)(id resp))resp;
 
+
+/// 加载指数信息
+/// @param resp <#resp description#>
 + (void)getIndexInfo:(void(^)(id resp))resp;
 
 

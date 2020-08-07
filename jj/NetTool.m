@@ -9,6 +9,7 @@
 #import "NetTool.h"
 #import "AFNetworking.h"
 #import "FundModel.h"
+#import "AlertTool.h"
 /// 数据来源天天基金
 #define tturl @"http://fundgz.1234567.com.cn/js/"
 
@@ -27,10 +28,10 @@
              FundModel *fm = [[FundModel alloc]initWithDic:dic];
              resp(fm);
           }
-          NSLog(@"responseObject===%@",string);
+//          NSLog(@"responseObject===%@",string);
       } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-//          NSLog(@"NSError===%@",error);
-          resp(error);
+          NSLog(@"NSError===%@",error);
+          [AlertTool showAlert:@"哎呀呀，搜寻基码出错了" actionTitle1:@"换个基码" actionTitle2:@"" window:[NSApplication sharedApplication].keyWindow action:nil];
       }];
     
 }
@@ -41,7 +42,9 @@
           mgr.requestSerializer = [AFHTTPRequestSerializer serializer];
           mgr.responseSerializer = [AFJSONResponseSerializer serializer];
           mgr.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json",nil];
-          [mgr GET:@"https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f2,f3,f4,f12,f14&secids=1.000001,1.000300,0.399001" parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {              NSLog(@"responseObject===%@",responseObject);
+          [mgr GET:@"https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f2,f3,f4,f12,f14&secids=1.000001,1.000300,0.399001" parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+              
+//              NSLog(@"responseObject===%@",responseObject);
               
               NSArray *diffA = responseObject[@"data"][@"diff"];
               NSMutableArray *diffM = [NSMutableArray array];
@@ -52,7 +55,7 @@
               resp(diffM);
             } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
               NSLog(@"NSError===%@",error);
-              resp(error);
+             [AlertTool showAlert:@"哎呀呀，出错了" actionTitle1:@"换个基码" actionTitle2:@"" window:[NSApplication sharedApplication].keyWindow action:nil];
           }];
     
     

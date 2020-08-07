@@ -48,10 +48,16 @@ typedef enum : NSUInteger {
 /// 重置数据
 - (void)resetDefaultData:(SourceType)st resp:(void(^)(id resp))resp;
 
-
 /// 拖拽后，重排数据
 /// @param st <#st description#>
 /// @param modelsAry <#modelsAry description#>
 - (void)dragReset:(SourceType)st modelsAry:(NSArray *)modelsAry;
+
+/// 保存持仓数
+/// @param mdic <#mdic description#>
+- (void)saveInvestedMoney:(NSMutableDictionary *)mdic;
+
+/// 获取持仓数
+- (NSDictionary *)getInvestedMoney;
 @end
 

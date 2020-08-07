@@ -20,7 +20,7 @@
         self.gsz = dic[@"gsz"];
         self.dwjz = dic[@"dwjz"];
         self.f2 = [NSString stringWithFormat:@"%@",dic[@"f2"]];
-        self.f3 = [NSString stringWithFormat:@"%@",dic[@"f3"]];
+        self.f3 = [[NSString stringWithFormat:@"%@",dic[@"f3"]]stringByAppendingString:@"%"];
         self.f4 = [NSString stringWithFormat:@"%@",dic[@"f4"]];
         CGFloat gz = [dic[@"gszzl"] floatValue];
         self.gszzl = [[NSString stringWithFormat:@"%.2f",gz]stringByAppendingString:@"%"];

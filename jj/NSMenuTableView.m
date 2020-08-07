@@ -13,6 +13,9 @@
 - (void)drawRect:(NSRect)dirtyRect {
     [super drawRect:dirtyRect];
 }
+
+/// 设置右键菜单
+/// @param event <#event description#>
 - (NSMenu *)menuForEvent:(NSEvent *)event{
     
     if (event.type == NSEventTypeRightMouseDown) {

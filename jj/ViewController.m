@@ -13,23 +13,171 @@
 
 @implementation ViewController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    [self UISet];
-    [self loadData];
+#pragma mark -------------------- 数据
+- (IBAction)resetClick:(id)sender {
+    
+    [AlertTool showAlert:@"数据将恢复至默认基金排行榜（天天基金榜十，跟着榜单走，没准能吃到基肉哦）" actionTitle1:@"好的" actionTitle2:@"取消" window:[self.view window] action:^(AlertResponse resp) {
+        if (resp == FirstResp) {
+            [[DataManager manger]resetDefaultData:self->_st resp:^(id resp) {
+                [self refreshData];
+            }];
+        }
+    }];
+    
 }
+- (IBAction)addClick:(id)sender {
+    
+    [self addFund:self.codeTf.stringValue];
+    
+}
+- (void)addFund:(NSString *)code {
+    
+      [[DataManager manger]addData:code source:_st resp:^(id  _Nonnull result, AlertType at) {
+          
+          if (at == AlertEmpty) {
+              [AlertTool showAlert:@"别点了，鼠标好使！" actionTitle1:@"输入基码" actionTitle2:nil window:[self.view window] action:nil];
+          } else if (at == AlertRepeat) {
+              [AlertTool showAlert:@"添加过了，老弟！" actionTitle1:@"好的" actionTitle2:nil window:[self.view window] action:nil];
+          } else if (at == AlertNull) {
+              [AlertTool showAlert:@"未查询到相关基码信息" actionTitle1:@"晓得喽" actionTitle2:nil window:[self.view window] action:nil];
+          } else {
+              [self refreshData];
+          }
+          
+      }];
+    
+}
+- (IBAction)autuRefreshClick:(NSButton *)sender {
+    
+    sender.accessibilitySelected = !sender.accessibilitySelected;
+    if (sender.accessibilitySelected) {
+        sender.title = @"停止自动刷新";
+        dispatch_resume(self.timer);
+    }else{
+        sender.title = @"自动刷新";
+        dispatch_suspend(self.timer);
+    }
+    
+}
+- (IBAction)refreshClick:(id)sender {
+    [self refreshData];
+}
+- (IBAction)changeSource:(NSButton *)sender {
+    
+    sender.accessibilitySelected = !sender.accessibilitySelected;
+       if (sender.accessibilitySelected) {
+          _st = OtherType;
+          sender.title = @"自选源";
+
+       }else{
+        _st = RecommedType;
+        sender.title = @"推荐源";
+        self.totolLabel.stringValue = @"刮开有奖";
+       }
+       [self refreshData];
+
+}
+
+- (void)loadData {
+    
+    [self refreshData];
+    
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    
+    dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
+    
+    dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC, 0 * NSEC_PER_SEC);
+    
+    dispatch_source_set_event_handler(timer, ^{
+        [self refreshData];
+    });
+    
+    self.timer = timer;
+    
+}
+
+/// 刷新数据
+- (void)refreshData {
+    
+    [self loadJC];
+    [[DataManager manger]loadData:_st resp:^(id  _Nonnull resp) {
+          self.modelsAry = resp;
+       
+          [self.codeTableV reloadData];
+        
+          [self caculateIncome:self.modelsAry];
+    }];
+    [NetTool getIndexInfo:^(NSArray <FundModel *>*mArray) {
+            
+           [self configureUI:mArray];
+                   
+    }];
+}
+
+/// 加载持仓数据
+- (void)loadJC {
+    
+    NSDictionary *jcDic = [[DataManager manger]getInvestedMoney];
+    if (jcDic.count > 0) {
+        self.ccDic = [NSMutableDictionary dictionaryWithDictionary:jcDic];
+    }else {
+        self.ccDic = [NSMutableDictionary dictionary];
+    }
+    
+}
+
+/// 计算总收益
+/// @param mary <#ary description#>
+- (void)caculateIncome:(NSArray <FundModel *>*)mary {
+    NSMutableDictionary *tempD = [NSMutableDictionary dictionary];
+    [mary enumerateObjectsUsingBlock:^(FundModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        
+        [tempD setValue:obj.gszzl forKey:obj.fundcode];
+
+    }];
+   __block CGFloat zsy = 0;
+    [tempD enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key1, id  _Nonnull obj1, BOOL * _Nonnull stop) {
+    
+        [self.ccDic enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key2, id  _Nonnull obj2, BOOL * _Nonnull stop) {
+            
+            if (key1 == key2) {
+                zsy += [obj1 floatValue] / 100 * [obj2 floatValue];
+            }
+
+        }];
+
+    }];
+    if (_st == RecommedType) {
+        self.totolLabel.stringValue = @"刮开有奖";
+        self.totolLabel.textColor = [NSColor lightGrayColor];
+    }else {
+        NSString *totolStr = [NSString stringWithFormat:@"%.2f",zsy];
+        self.totolLabel.stringValue = totolStr;
+        if ([totolStr containsString:@"-"]) {
+            self.totolLabel.textColor = GREENCOLOR;
+        }else {
+            self.totolLabel.textColor = [NSColor redColor];
+        }
+    }
+    
+    
+}
+#pragma mark -------------------- UI
+
 - (void)UISet {
     
     self.codeTableV.delegate = (id)self;
     self.codeTableV.dataSource = self;
     self.codeTableV.mhdelegate = self;
-
+    self.codeTableV.selectionHighlightStyle = NSTableViewSelectionHighlightStyleNone;
+    
     [self.codeTableV registerForDraggedTypes:@[NSPasteboardTypeString]];
     self.codeTableV.draggingDestinationFeedbackStyle = NSTableViewDraggingDestinationFeedbackStyleSourceList;
-
+    
+    self.codeTf.delegate = self;
+    
     _st = RecommedType;
 }
-
 - (void)configureUI:(NSArray <FundModel *>*)ary {
     
     //上证指数
@@ -42,9 +190,9 @@
     self.shangLabel.stringValue = szhm.f2;
     self.huLabel.stringValue = hsm.f2;
     self.shenLabel.stringValue = scm.f2;
-    self.shang1Label.stringValue = szhm.f4;
-    self.hu1Label.stringValue = hsm.f4;
-    self.shen1Label.stringValue = scm.f4;
+    self.shang1Label.stringValue = [NSString stringWithFormat:@"%@/%@",szhm.f3,szhm.f4];
+    self.hu1Label.stringValue = [NSString stringWithFormat:@"%@/%@",hsm.f3,hsm.f4];
+    self.shen1Label.stringValue = [NSString stringWithFormat:@"%@/%@",scm.f3,scm.f4];
     
     
     if ([szhm.f3 containsString:@"-"]) {
@@ -77,95 +225,7 @@
     }
     
 }
-- (IBAction)resetClick:(id)sender {
-    
-    [AlertTool showAlert:@"数据将恢复至默认基金排行榜（天天基金榜十，跟着榜单走，没准能吃到基肉哦）" actionTitle1:@"好的" actionTitle2:@"取消" window:[self.view window] action:^(AlertResponse resp) {
-        if (resp == FirstResp) {
-            [[DataManager manger]resetDefaultData:self->_st resp:^(id resp) {
-                [self refreshData];
-            }];
-        }
-    }];
-    
-}
-- (IBAction)addClick:(id)sender {
-    
-    NSString *codeStr = self.codeTf.stringValue;
-    
-    [[DataManager manger]addData:codeStr source:_st resp:^(id  _Nonnull result, AlertType at) {
-        
-        if (at == AlertEmpty) {
-            [AlertTool showAlert:@"别点了，鼠标好使！" actionTitle1:@"输入基码" actionTitle2:nil window:[self.view window] action:nil];
-        } else if (at == AlertRepeat) {
-            [AlertTool showAlert:@"添加过了，老弟！" actionTitle1:@"好的" actionTitle2:nil window:[self.view window] action:nil];
-        } else if (at == AlertNull) {
-            [AlertTool showAlert:@"未查询到相关基码信息" actionTitle1:@"晓得喽" actionTitle2:nil window:[self.view window] action:nil];
-        } else {
-            [self refreshData];
-        }
-        
-    }];
-    
-}
-- (IBAction)autuRefreshClick:(NSButton *)sender {
-    
-    sender.accessibilitySelected = !sender.accessibilitySelected;
-    if (sender.accessibilitySelected) {
-        sender.title = @"停止自动刷新";
-        dispatch_resume(self.timer);
-    }else{
-        sender.title = @"自动刷新";
-        dispatch_suspend(self.timer);
-    }
-    
-}
-- (IBAction)refreshClick:(id)sender {
-    [self refreshData];
-}
-- (IBAction)changeSource:(NSButton *)sender {
-    
-    sender.accessibilitySelected = !sender.accessibilitySelected;
-       if (sender.accessibilitySelected) {
-          _st = OtherType;
-          sender.title = @"自选源";
-       }else{
-        _st = RecommedType;
-        sender.title = @"推荐源";
-       }
-       [self refreshData];
-
-}
-
-- (void)loadData {
-    
-        [self refreshData];
-    
-        dispatch_queue_t queue = dispatch_get_main_queue();
-         
-          dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
-       
-          dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC, 0 * NSEC_PER_SEC);
-          
-          dispatch_source_set_event_handler(timer, ^{
-              [self refreshData];
-          });
-          
-          self.timer = timer;
-  
-    
-}
-- (void)refreshData {
-    [[DataManager manger]loadData:_st resp:^(id  _Nonnull resp) {
-          self.modelsAry = resp;
-          [self.codeTableV reloadData];
-    }];
-    [NetTool getIndexInfo:^(NSArray <FundModel *>*mArray) {
-            
-           [self configureUI:mArray];
-                   
-    }];
-}
-
+#pragma mark -------------------- NSTableView
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
     return self.modelsAry.count;
 }
@@ -194,6 +254,32 @@
             cell.textField.textColor = [NSColor redColor];
         }
         return cell;
+    }else if (tableColumn == tableView.tableColumns[5]) {
+        NSView * view = [tableView makeViewWithIdentifier:@"cellId" owner:self];
+        if (view==nil) {
+            view = [[NSView alloc]initWithFrame:CGRectZero];
+            NSTextField *jct = [[NSTextField alloc]initWithFrame:CGRectMake(0, 10, 100, 20)];
+            jct.alignment = NSTextAlignmentCenter;
+            if (_st == RecommedType) {
+                jct.editable = NO;
+                jct.placeholderString = @"\\";
+
+            }else {
+                jct.editable = YES;
+                jct.delegate = self;
+                jct.tag = row;
+                NSString *jcStr =  [self.ccDic objectForKey:model.fundcode];
+
+                if (jcStr.length > 0) {
+                              jct.stringValue = jcStr;
+                }else {
+                              jct.placeholderString = @"基金持有金额";
+                }
+            }
+            [view addSubview:jct];
+            
+        }
+        return view;
     }else{
         NSTableCellView *cell = [tableView makeViewWithIdentifier:@"cell3" owner:nil];
         cell.textField.stringValue = model.gztime;
@@ -201,6 +287,10 @@
     }
   
 }
+- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {
+    return 40;
+}
+#pragma mark -------------------- 拖拽
 - (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
     NSData *indexSetData = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes requiringSecureCoding:YES error:nil];
@@ -228,9 +318,9 @@
     if (sourceRow < row) {
         // 从上往下移
           [self.modelsAry insertObject:[self.modelsAry objectAtIndex:sourceRow] atIndex:row];
-           [self.modelsAry removeObjectAtIndex:sourceRow];
-           [self.codeTableV reloadData];
-        [[DataManager manger]dragReset:_st modelsAry:self.modelsAry];
+          [self.modelsAry removeObjectAtIndex:sourceRow];
+          [self.codeTableV reloadData];
+          [[DataManager manger]dragReset:_st modelsAry:self.modelsAry];
            return YES;
     }else {
         FundModel *smodel = [self.modelsAry objectAtIndex:sourceRow];
@@ -241,21 +331,58 @@
         return YES;
     }
 }
-
-- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {
-    return 40;
-}
+#pragma mark -------------------- 点击
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row {
-    NSLog(@"shouldSelectRow==%ld",(long)row);
+//    NSLog(@"shouldSelectRow==%ld",(long)row);
     return YES;
 }
 - (void)tableView:(NSTableView *)tableView didClickMenuDelete:(NSInteger)row {
-    NSLog(@"didClickMenuDelete===%ld",(long)row);
+//    NSLog(@"didClickMenuDelete===%ld",(long)row);
     [[DataManager manger]deleteData:row source:_st resp:^(id resp) {
         [self refreshData];
     }];
 }
+#pragma mark -------------------- NSControl
+- (BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor {
+//    NSLog(@"textShouldBeginEditing");
+    return YES;
+}
+- (BOOL)control:(NSControl *)control textShouldEndEditing:(NSText *)fieldEditor{
+    NSString *jcStr = fieldEditor.string;
+    if (control == self.codeTf) {
+      [self addFund:self.codeTf.stringValue];
+    }else {
+    FundModel *model = self.modelsAry[control.tag];
+    NSLog(@"control==%ld",control.tag);
+    if (jcStr.length > 0) {
+     if (![self isPureFloat:jcStr]) {
+        [AlertTool showAlert:@"请输入正确金额[0123456789.]，兄弟" actionTitle1:@"明白" actionTitle2:@"" window:[self.view window] action:nil];
+     }else {
+         [self.ccDic setValue:[NSString stringWithFormat:@"%@",jcStr] forKey:model.fundcode];
+         [[DataManager manger]saveInvestedMoney:self.ccDic];
+         [self refreshData];
+     }
+    }
+    }
+    return YES;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self UISet];
+    [self loadData];
+}
+
 - (void)viewWillDisappear {
     dispatch_source_cancel(self.timer);
 }
+
+- (BOOL)isPureFloat:(NSString*)string {
+    NSScanner *scan = [NSScanner scannerWithString:string];
+ 
+    float val;
+ 
+    return [scan scanFloat:&val] && [scan isAtEnd];
+}
+
 @end
