@@ -10,10 +10,32 @@
 #import "AlertTool.h"
 
 #define GREENCOLOR [NSColor colorWithDeviceRed:140/255.0 green:212/255.0 blue:144/255.0 alpha:1]
+#define EYEON @"eyeon"
 
 @implementation ViewController
 
 #pragma mark -------------------- 数据
+
+- (IBAction)eyeBtn:(NSButton *)sender {
+    BOOL eyeOn = [[[NSUserDefaults standardUserDefaults]objectForKey:EYEON]boolValue];
+    sender.accessibilitySelected = eyeOn;
+    if (_st != RecommedType) {
+        sender.accessibilitySelected = !sender.accessibilitySelected;
+          if (sender.accessibilitySelected) {
+              [[NSUserDefaults standardUserDefaults]setBool:YES forKey:EYEON];
+              sender.image = [NSImage imageNamed:@"eye"];
+              self.allMoneyLabel.stringValue = self.ztzStr;
+              self.totolLabel.stringValue = self.zsyStr;
+          }else{
+              [[NSUserDefaults standardUserDefaults]setBool:NO forKey:EYEON];
+             sender.image = [NSImage imageNamed:@"eey"];
+             self.allMoneyLabel.stringValue = @"******";
+             self.totolLabel.stringValue = @"******";
+          }
+     }
+    
+}
+
 - (IBAction)resetClick:(id)sender {
     
     [AlertTool showAlert:@"数据将恢复至默认基金排行榜（天天基金榜十，跟着榜单走，没准能吃到基肉哦）" actionTitle1:@"好的" actionTitle2:@"取消" window:[self.view window] action:^(AlertResponse resp) {
@@ -65,15 +87,17 @@
 - (IBAction)changeSource:(NSButton *)sender {
     
     sender.accessibilitySelected = !sender.accessibilitySelected;
-       if (sender.accessibilitySelected) {
+    if (sender.accessibilitySelected) {
           _st = OtherType;
           sender.title = @"自选源";
-
-       }else{
+          self.eyeBtn.hidden = NO;
+    }else{
         _st = RecommedType;
         sender.title = @"推荐源";
         self.totolLabel.stringValue = @"刮开有奖";
-       }
+        self.eyeBtn.hidden = YES;
+    }
+    
        [self refreshData];
 
 }
@@ -129,19 +153,26 @@
 /// 计算总收益
 /// @param mary <#ary description#>
 - (void)caculateIncome:(NSArray <FundModel *>*)mary {
+    
+     // 总收益
+    __block  CGFloat zsy = 0.0;
+     // 总投资
+    __block  CGFloat ztz = 0.0;
+    
     NSMutableDictionary *tempD = [NSMutableDictionary dictionary];
     [mary enumerateObjectsUsingBlock:^(FundModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         
         [tempD setValue:obj.gszzl forKey:obj.fundcode];
 
     }];
-   __block CGFloat zsy = 0;
+
     [tempD enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key1, id  _Nonnull obj1, BOOL * _Nonnull stop) {
     
         [self.ccDic enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key2, id  _Nonnull obj2, BOOL * _Nonnull stop) {
             
             if (key1 == key2) {
                 zsy += [obj1 floatValue] / 100 * [obj2 floatValue];
+                ztz += [obj2 floatValue];
             }
 
         }];
@@ -150,16 +181,27 @@
     if (_st == RecommedType) {
         self.totolLabel.stringValue = @"刮开有奖";
         self.totolLabel.textColor = [NSColor lightGrayColor];
+        self.allMoneyLabel.stringValue = @"清仓保平安";
+        self.allMoneyLabel.textColor = [NSColor lightGrayColor];
     }else {
-        NSString *totolStr = [NSString stringWithFormat:@"%.2f",zsy];
-        self.totolLabel.stringValue = totolStr;
-        if ([totolStr containsString:@"-"]) {
+        self.zsyStr = [NSString stringWithFormat:@"%.2f",zsy];
+        self.ztzStr = [NSString stringWithFormat:@"%.2f",ztz];
+        if ([self.zsyStr containsString:@"-"]) {
             self.totolLabel.textColor = GREENCOLOR;
         }else {
             self.totolLabel.textColor = [NSColor redColor];
         }
+        self.allMoneyLabel.textColor = [NSColor redColor];
+        
+        BOOL eyeOn = [[[NSUserDefaults standardUserDefaults]objectForKey:EYEON]boolValue];
+        if (eyeOn) {
+            self.allMoneyLabel.stringValue = self.ztzStr;
+            self.totolLabel.stringValue = self.zsyStr;
+        }else {
+            self.allMoneyLabel.stringValue = @"******";
+            self.totolLabel.stringValue = @"******";
+        }
     }
-    
     
 }
 #pragma mark -------------------- UI
@@ -175,8 +217,20 @@
     self.codeTableV.draggingDestinationFeedbackStyle = NSTableViewDraggingDestinationFeedbackStyleSourceList;
     
     self.codeTf.delegate = self;
-    
     _st = RecommedType;
+    
+    self.eyeBtn.hidden = YES;
+    
+    BOOL eyeOn = [[[NSUserDefaults standardUserDefaults]objectForKey:EYEON]boolValue];
+
+    if (eyeOn) {
+        self.eyeBtn.accessibilitySelected = YES;
+        self.eyeBtn.image = [NSImage imageNamed:@"eye"];
+    }else {
+        self.eyeBtn.accessibilitySelected = NO;
+        self.eyeBtn.image = [NSImage imageNamed:@"eey"];
+    }
+    
 }
 - (void)configureUI:(NSArray <FundModel *>*)ary {
     
@@ -353,7 +407,7 @@
       [self addFund:self.codeTf.stringValue];
     }else {
     FundModel *model = self.modelsAry[control.tag];
-    NSLog(@"control==%ld",control.tag);
+//    NSLog(@"control==%ld",control.tag);
     if (jcStr.length > 0) {
      if (![self isPureFloat:jcStr]) {
         [AlertTool showAlert:@"请输入正确金额[0123456789.]，兄弟" actionTitle1:@"明白" actionTitle2:@"" window:[self.view window] action:nil];

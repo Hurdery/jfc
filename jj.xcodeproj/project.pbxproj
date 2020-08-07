@@ -107,6 +107,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8065780F24DD388A00A49D39 /* tool */ = {
+			isa = PBXGroup;
+			children = (
+				80A1287224C18DDF008BD87E /* NetTool.h */,
+				80A1287324C18DDF008BD87E /* NetTool.m */,
+				804BFCD324C8371F004EB109 /* AlertTool.h */,
+				804BFCD424C8371F004EB109 /* AlertTool.m */,
+				804BFCDF24C8613E004EB109 /* DataManager.h */,
+				804BFCE024C8613E004EB109 /* DataManager.m */,
+			);
+			path = tool;
+			sourceTree = "<group>";
+		};
 		80A1281B24C144BF008BD87E = {
 			isa = PBXGroup;
 			children = (
@@ -134,12 +147,7 @@
 				804BFD5124C9938A004EB109 /* NSMenuTableView.m */,
 				80A1287524C193C5008BD87E /* FundModel.h */,
 				80A1287624C193C5008BD87E /* FundModel.m */,
-				80A1287224C18DDF008BD87E /* NetTool.h */,
-				80A1287324C18DDF008BD87E /* NetTool.m */,
-				804BFCD324C8371F004EB109 /* AlertTool.h */,
-				804BFCD424C8371F004EB109 /* AlertTool.m */,
-				804BFCDF24C8613E004EB109 /* DataManager.h */,
-				804BFCE024C8613E004EB109 /* DataManager.m */,
+				8065780F24DD388A00A49D39 /* tool */,
 				80A1282D24C144C1008BD87E /* Assets.xcassets */,
 				80A1282F24C144C1008BD87E /* Main.storyboard */,
 				80A1283224C144C1008BD87E /* Info.plist */,

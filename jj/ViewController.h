@@ -26,7 +26,15 @@
 @property (weak) IBOutlet NSImageView *shangImage;
 @property (weak) IBOutlet NSImageView *shenImage;
 @property (weak) IBOutlet NSTextField *totolLabel;
+@property (weak) IBOutlet NSTextField *allMoneyLabel;
+@property (weak) IBOutlet NSButton *eyeBtn;
+
 @property(nonatomic,assign) SourceType st;
+/// 总收益
+@property(nonatomic,copy) NSString *zsyStr;
+/// 总投资
+@property(nonatomic,copy) NSString *ztzStr;
+
 
 /// 存放持仓数据
 @property (nonatomic, strong) NSMutableDictionary *ccDic;
