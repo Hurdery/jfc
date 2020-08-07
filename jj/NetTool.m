@@ -44,7 +44,7 @@
           mgr.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json",nil];
           [mgr GET:@"https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f2,f3,f4,f12,f14&secids=1.000001,1.000300,0.399001" parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
               
-//              NSLog(@"responseObject===%@",responseObject);
+              NSLog(@"responseObject===%@",responseObject);
               
               NSArray *diffA = responseObject[@"data"][@"diff"];
               NSMutableArray *diffM = [NSMutableArray array];
