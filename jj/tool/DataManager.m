@@ -25,6 +25,7 @@
 }
 
 - (void)loadData:(SourceType)st resp:(void(^)(id resp))resp {
+       NSLog(@"发起请求");
 
        NSArray *sourceA;
        if (st == RecommedType) {
@@ -36,6 +37,16 @@
             }
            
        } else {
+           
+           NSMutableArray *resultArrM = [NSMutableArray array];
+           NSArray  *originalArr = [[NSUserDefaults standardUserDefaults]objectForKey:jjMyKey];
+
+              for (NSString *item in originalArr) {
+                  if (![resultArrM containsObject:item]) {
+                    [resultArrM addObject:item];
+                  }
+              }
+           
            sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjMyKey];
        }
     
@@ -71,7 +82,7 @@
            
            }];
            [self.modelsAry addObjectsFromArray:[self sortHomeModelArray:tempB]];
-                 
+           NSLog(@"请求完成");
            if (resp) {
                resp(self.modelsAry);
            }
@@ -142,6 +153,18 @@
               [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:mjja] forKey:jjMyKey];
           }
     resp(@"delete");
+    
+}
+- (NSString *)getCode:(NSInteger)row source:(SourceType)st{
+    
+          NSArray *sourceA;
+          if (st == RecommedType) {
+              sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjKey];
+          } else {
+              sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjMyKey];
+          }
+    
+         return [sourceA objectAtIndex:row];
     
 }
 - (void)clearData{

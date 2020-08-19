@@ -1165,6 +1165,16 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
                             </scrollView>
+                            <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5Q4-YG-GJS">
+                                <rect key="frame" x="23" y="7" width="67" height="32"/>
+                                <buttonCell key="cell" type="push" title="更新昨日持仓净值" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1hO-Vj-Qmr">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="updateAction:" target="XfG-lQ-9wD" id="Wvm-02-LBx"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="prU-8J-5Zw" firstAttribute="leading" secondItem="W2k-Jh-isB" secondAttribute="trailing" constant="20" id="08H-Dn-3aT"/>
@@ -1207,6 +1217,7 @@
                             <constraint firstItem="prU-8J-5Zw" firstAttribute="centerY" secondItem="ebT-bt-2qi" secondAttribute="centerY" id="j45-9F-YvS"/>
                             <constraint firstItem="Iqw-ch-aNB" firstAttribute="top" secondItem="bst-dh-6o2" secondAttribute="bottom" constant="10" id="kgn-6I-v2V"/>
                             <constraint firstItem="IwG-H3-tx9" firstAttribute="centerY" secondItem="iCA-c2-YO8" secondAttribute="centerY" id="klE-Wa-u0p"/>
+                            <constraint firstItem="5Q4-YG-GJS" firstAttribute="centerY" secondItem="7ZC-vT-Xww" secondAttribute="centerY" id="lZV-kM-2et"/>
                             <constraint firstItem="kIS-Y2-qAN" firstAttribute="centerY" secondItem="6GZ-Yi-2gU" secondAttribute="centerY" id="liV-Cn-8Jc"/>
                             <constraint firstItem="k0G-Y9-9Qm" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="24" id="llP-u7-8eZ"/>
                             <constraint firstItem="yng-gL-2yN" firstAttribute="top" secondItem="0KS-N6-L1S" secondAttribute="bottom" constant="8" id="p46-G9-aLg"/>
@@ -1214,6 +1225,7 @@
                             <constraint firstItem="ced-Fp-4wE" firstAttribute="leading" secondItem="Lms-xE-kga" secondAttribute="trailing" constant="15" id="riH-YT-aZ3"/>
                             <constraint firstItem="W2k-Jh-isB" firstAttribute="centerX" secondItem="lKC-xd-rD8" secondAttribute="centerX" id="sWm-BC-UxD"/>
                             <constraint firstItem="ebT-bt-2qi" firstAttribute="leading" secondItem="Sav-Xy-M5R" secondAttribute="trailing" constant="20" id="tPI-vo-B2B"/>
+                            <constraint firstItem="5Q4-YG-GJS" firstAttribute="leading" secondItem="kIS-Y2-qAN" secondAttribute="leading" id="u8y-fD-hWs"/>
                             <constraint firstItem="Lms-xE-kga" firstAttribute="top" secondItem="bpo-QG-cUl" secondAttribute="bottom" constant="20" id="vff-A0-fEJ"/>
                             <constraint firstItem="D8r-gV-7Ni" firstAttribute="centerY" secondItem="6GZ-Yi-2gU" secondAttribute="centerY" id="w7p-Se-yKB"/>
                             <constraint firstItem="mTb-vR-AdZ" firstAttribute="leading" secondItem="UHc-Eb-8K1" secondAttribute="trailing" constant="15" id="wsF-O2-wk4"/>
@@ -1236,6 +1248,7 @@
                         <outlet property="shenImage" destination="prU-8J-5Zw" id="Ta8-H3-yup"/>
                         <outlet property="shenLabel" destination="W2k-Jh-isB" id="1k6-HH-ATP"/>
                         <outlet property="totolLabel" destination="ced-Fp-4wE" id="Iy5-u6-Kig"/>
+                        <outlet property="updateBtn" destination="5Q4-YG-GJS" id="WBa-Up-j9E"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

@@ -8,13 +8,17 @@
 
 #import "NetTool.h"
 #import "AFNetworking.h"
-#import "FundModel.h"
 #import "AlertTool.h"
 /// 数据来源天天基金
 #define tturl @"http://fundgz.1234567.com.cn/js/"
+#define ttjzurl @"http://fund.eastmoney.com/f10/F10DataApi.aspx?"
 
+//http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=320007&page=1&per=20&sdate=2020-08-15&edate=2020-08-15
+//http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=320007&page=1&per=30
+//http://fund.eastmoney.com/320007.html
 @implementation NetTool
 + (void)getFundInfo:(NSString *)code complete:(void(^)(id resp))resp {
+    
       AFHTTPSessionManager *mgr = [AFHTTPSessionManager manager];
       mgr.requestSerializer = [AFHTTPRequestSerializer serializer];
       mgr.responseSerializer = [AFHTTPResponseSerializer serializer];
@@ -26,6 +30,7 @@
           
           if (dic) {
              FundModel *fm = [[FundModel alloc]initWithDic:dic];
+//             fm.refreshtime = [self getCurrentTimes];
              resp(fm);
           }
 //          NSLog(@"responseObject===%@",string);
@@ -36,8 +41,40 @@
     
 }
 
-+ (void)getIndexInfo:(void(^)(id resp))resp {
++ (void)getFundLastJZ:(NSString *)code resp:(void(^)(id resp))resp {
+
+      AFHTTPSessionManager *mgr = [AFHTTPSessionManager manager];
+      mgr.requestSerializer = [AFHTTPRequestSerializer serializer];
+      mgr.responseSerializer = [AFHTTPResponseSerializer serializer];
+      mgr.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"text/html",nil];
+      NSString *timeStr ;
+      NSString *curWeek = [TimeTool weekdayString];
+      if ([curWeek isEqualToString:@"周一"]) {
+         timeStr = [TimeTool getbeforebeforeyesterday];
+      }else{
+        timeStr = [TimeTool getLastday];
+      }
     
+      [mgr GET:[NSString stringWithFormat:@"http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=%@&&sdate=%@",code,timeStr] parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+          
+           NSString *jzStr = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+                  
+            if ([jzStr containsString:@"%"]) {
+                
+                  NSRange range = [jzStr rangeOfString:@"%"];
+                  jzStr = [[jzStr substringWithRange:NSMakeRange(range.location - 5, 5)]stringByReplacingOccurrencesOfString:@">" withString:@""];
+//                  NSLog(@"rang:%@",NSStringFromRange(range));
+//                  NSLog(@"净值：%@",jzStr);
+                  resp(jzStr);
+            }
+                
+                  
+              } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+                  NSLog(@"NSError===%@",error);
+                  [AlertTool showAlert:@"哎呀呀，获取净值出错了" actionTitle1:@"稍后再试" actionTitle2:@"" window:[NSApplication sharedApplication].keyWindow action:nil];
+              }];
+}
++ (void)getIndexInfo:(void(^)(id resp))resp {
           AFHTTPSessionManager *mgr = [AFHTTPSessionManager manager];
           mgr.requestSerializer = [AFHTTPRequestSerializer serializer];
           mgr.responseSerializer = [AFJSONResponseSerializer serializer];

@@ -11,6 +11,7 @@
 @protocol MenuHandleDelegate <NSObject>
 
 - (void)tableView:(NSTableView *)tableView didClickMenuDelete:(NSInteger)row;
+- (void)tableView:(NSTableView *)tableView didClickMenuDetail:(NSInteger)row;
 
 @end
 

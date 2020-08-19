@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "FundModel.h"
+#import "TimeTool.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,6 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param resp <#resp description#>
 + (void)getIndexInfo:(void(^)(id resp))resp;
 
+/// 获取上天净值
+/// @param code <#code description#>
++ (void)getFundLastJZ:(NSString *)code resp:(void(^)(id resp))resp;
 
 @end
 

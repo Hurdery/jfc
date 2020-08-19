@@ -42,6 +42,11 @@ typedef enum : NSUInteger {
 /// @param resp <#resp description#>
 - (void)deleteData:(NSInteger)row source:(SourceType)st resp:(void(^)(id resp))resp;
 
+/// 获取某行基码
+/// @param row <#row description#>
+/// @param st <#st description#>
+- (NSString *)getCode:(NSInteger)row source:(SourceType)st;
+
 /// 清楚数据
 - (void)clearData;
 

@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic,copy)NSString *gszzl;
 /// 基止
 @property(nonatomic,copy)NSString *gztime;
+/// 基刷
+@property(nonatomic,copy)NSString *refreshtime;
 /// 基时
 @property(nonatomic,copy)NSString *jzrq;
 /// 基净

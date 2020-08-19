@@ -11,6 +11,9 @@
 		804BFCDB24C85897004EB109 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 804BFCDA24C85897004EB109 /* InfoPlist.strings */; };
 		804BFCE124C8613E004EB109 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 804BFCE024C8613E004EB109 /* DataManager.m */; };
 		804BFD5224C9938A004EB109 /* NSMenuTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 804BFD5124C9938A004EB109 /* NSMenuTableView.m */; };
+		809A117E24EA80CA00249327 /* FundJZWC.m in Sources */ = {isa = PBXBuildFile; fileRef = 809A117C24EA80CA00249327 /* FundJZWC.m */; };
+		809A117F24EA80CA00249327 /* FundJZWC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 809A117D24EA80CA00249327 /* FundJZWC.xib */; };
+		809A118224EBC9D600249327 /* TimeTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 809A118124EBC9D600249327 /* TimeTool.m */; };
 		80A1282924C144BF008BD87E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 80A1282824C144BF008BD87E /* AppDelegate.m */; };
 		80A1282C24C144BF008BD87E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 80A1282B24C144BF008BD87E /* ViewController.m */; };
 		80A1282E24C144C1008BD87E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 80A1282D24C144C1008BD87E /* Assets.xcassets */; };
@@ -45,6 +48,11 @@
 		804BFCE024C8613E004EB109 /* DataManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DataManager.m; sourceTree = "<group>"; };
 		804BFD5024C9938A004EB109 /* NSMenuTableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSMenuTableView.h; sourceTree = "<group>"; };
 		804BFD5124C9938A004EB109 /* NSMenuTableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NSMenuTableView.m; sourceTree = "<group>"; };
+		809A117B24EA80CA00249327 /* FundJZWC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FundJZWC.h; sourceTree = "<group>"; };
+		809A117C24EA80CA00249327 /* FundJZWC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FundJZWC.m; sourceTree = "<group>"; };
+		809A117D24EA80CA00249327 /* FundJZWC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FundJZWC.xib; sourceTree = "<group>"; };
+		809A118024EBC9D600249327 /* TimeTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TimeTool.h; sourceTree = "<group>"; };
+		809A118124EBC9D600249327 /* TimeTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TimeTool.m; sourceTree = "<group>"; };
 		80A1282424C144BF008BD87E /* jj.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = jj.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		80A1282724C144BF008BD87E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		80A1282824C144BF008BD87E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -116,6 +124,8 @@
 				804BFCD424C8371F004EB109 /* AlertTool.m */,
 				804BFCDF24C8613E004EB109 /* DataManager.h */,
 				804BFCE024C8613E004EB109 /* DataManager.m */,
+				809A118024EBC9D600249327 /* TimeTool.h */,
+				809A118124EBC9D600249327 /* TimeTool.m */,
 			);
 			path = tool;
 			sourceTree = "<group>";
@@ -143,6 +153,9 @@
 				80A1282824C144BF008BD87E /* AppDelegate.m */,
 				80A1282A24C144BF008BD87E /* ViewController.h */,
 				80A1282B24C144BF008BD87E /* ViewController.m */,
+				809A117B24EA80CA00249327 /* FundJZWC.h */,
+				809A117C24EA80CA00249327 /* FundJZWC.m */,
+				809A117D24EA80CA00249327 /* FundJZWC.xib */,
 				804BFD5024C9938A004EB109 /* NSMenuTableView.h */,
 				804BFD5124C9938A004EB109 /* NSMenuTableView.m */,
 				80A1287524C193C5008BD87E /* FundModel.h */,
@@ -274,6 +287,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				809A117F24EA80CA00249327 /* FundJZWC.xib in Resources */,
 				80A1286124C18D9A008BD87E /* LICENSE in Resources */,
 				804BFCDB24C85897004EB109 /* InfoPlist.strings in Resources */,
 				80A1282E24C144C1008BD87E /* Assets.xcassets in Resources */,
@@ -296,6 +310,7 @@
 				80A1286624C18D9A008BD87E /* WKWebView+AFNetworking.m in Sources */,
 				80A1286724C18D9A008BD87E /* UIImageView+AFNetworking.m in Sources */,
 				804BFCD524C8371F004EB109 /* AlertTool.m in Sources */,
+				809A118224EBC9D600249327 /* TimeTool.m in Sources */,
 				804BFD5224C9938A004EB109 /* NSMenuTableView.m in Sources */,
 				80A1286D24C18D9A008BD87E /* AFHTTPSessionManager.m in Sources */,
 				80A1286F24C18D9A008BD87E /* AFURLRequestSerialization.m in Sources */,
@@ -305,6 +320,7 @@
 				80A1286C24C18D9A008BD87E /* AFURLResponseSerialization.m in Sources */,
 				80A1286524C18D9A008BD87E /* AFNetworkActivityIndicatorManager.m in Sources */,
 				80A1287124C18D9A008BD87E /* AFSecurityPolicy.m in Sources */,
+				809A117E24EA80CA00249327 /* FundJZWC.m in Sources */,
 				80A1286924C18D9A008BD87E /* UIActivityIndicatorView+AFNetworking.m in Sources */,
 				80A1287024C18D9A008BD87E /* AFNetworkReachabilityManager.m in Sources */,
 				80A1286424C18D9A008BD87E /* UIRefreshControl+AFNetworking.m in Sources */,

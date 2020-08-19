@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "AlertTool.h"
+#import "FundJZWC.h"
 
 #define GREENCOLOR [NSColor colorWithDeviceRed:140/255.0 green:212/255.0 blue:144/255.0 alpha:1]
 #define EYEON @"eyeon"
@@ -50,7 +51,7 @@
 - (IBAction)addClick:(id)sender {
     
     [self addFund:self.codeTf.stringValue];
-    
+
 }
 - (void)addFund:(NSString *)code {
     
@@ -67,7 +68,6 @@
           }
           
       }];
-    
 }
 - (IBAction)autuRefreshClick:(NSButton *)sender {
     
@@ -91,15 +91,49 @@
           _st = OtherType;
           sender.title = @"自选源";
           self.eyeBtn.hidden = NO;
+        self.updateBtn.hidden = NO;
     }else{
         _st = RecommedType;
         sender.title = @"推荐源";
         self.totolLabel.stringValue = @"刮开有奖";
         self.eyeBtn.hidden = YES;
+        self.updateBtn.hidden = YES;
+    }
+       [self refreshData];
+}
+- (IBAction)updateAction:(NSButton *)sender {
+    
+    NSString *curWeek = [TimeTool weekdayString];
+    if ([curWeek isEqualToString:@"周六"]||[curWeek isEqualToString:@"周末"]) {
+        [AlertTool showAlert:@"基市关门，暂停营业" actionTitle1:@"门口候着！" actionTitle2:nil window:[self.view window] action:nil];
+        return;
     }
     
-       [self refreshData];
-
+    sender.enabled = NO;
+    [AlertTool showAlert:@"目前无法实现持仓净值的自动更新，所以需要诸基民每天自动点击更新，为避免出现什么么蛾子，建议每天只点一次，如点多次，导致数据错误（可以自己手动更正)，后果自负！！！目前无法实现持仓净值的自动更新，所以需要诸基民每天自动点击更新，为避免出现什么么蛾子，建议每天只点一次，如点多次，导致数据错误（可以自己手动更正)，后果自负！！！目前无法实现持仓净值的自动更新，所以需要诸基民每天自动点击更新，为避免出现什么么蛾子，建议每天只点一次，如点多次，导致数据错误（可以自己手动更正)，后果自负！！！" actionTitle1:@"每天更新一次！！！" actionTitle2:@"取消" window:[self.view window] action:^(AlertResponse resp) {
+        
+        if (resp == FirstResp) {
+                 
+            [self.ccDic enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj,  BOOL * _Nonnull stop) {
+                                        
+                [NetTool getFundLastJZ:key resp:^(id  _Nonnull resp) {
+                    
+                    CGFloat jzStr = [obj floatValue] + [obj floatValue] * [resp floatValue] / 100;
+                    [self.ccDic setValue:[NSString stringWithFormat:@"%.2f",jzStr] forKey:key];
+                    [[DataManager manger]saveInvestedMoney:self.ccDic];
+                    [self.codeTableV reloadData];
+                }];
+                
+            }];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(8 *60 *60 *NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                               sender.enabled = YES;
+            });
+        }else {
+            sender.enabled = YES;
+        }
+        
+    }];
+        
 }
 
 - (void)loadData {
@@ -123,9 +157,10 @@
 /// 刷新数据
 - (void)refreshData {
     
-    [self loadJC];
-    [[DataManager manger]loadData:_st resp:^(id  _Nonnull resp) {
+   [[DataManager manger]loadData:_st resp:^(id  _Nonnull resp) {
           self.modelsAry = resp;
+//           NSLog(@"基数：%ld",self.modelsAry.count);
+          [self loadJC];
        
           [self.codeTableV reloadData];
         
@@ -136,6 +171,7 @@
            [self configureUI:mArray];
                    
     }];
+
 }
 
 /// 加载持仓数据
@@ -147,7 +183,6 @@
     }else {
         self.ccDic = [NSMutableDictionary dictionary];
     }
-    
 }
 
 /// 计算总收益
@@ -161,9 +196,7 @@
     
     NSMutableDictionary *tempD = [NSMutableDictionary dictionary];
     [mary enumerateObjectsUsingBlock:^(FundModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        
         [tempD setValue:obj.gszzl forKey:obj.fundcode];
-
     }];
 
     [tempD enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key1, id  _Nonnull obj1, BOOL * _Nonnull stop) {
@@ -178,6 +211,7 @@
         }];
 
     }];
+    
     if (_st == RecommedType) {
         self.totolLabel.stringValue = @"刮开有奖";
         self.totolLabel.textColor = [NSColor lightGrayColor];
@@ -204,6 +238,7 @@
     }
     
 }
+
 #pragma mark -------------------- UI
 
 - (void)UISet {
@@ -220,7 +255,7 @@
     _st = RecommedType;
     
     self.eyeBtn.hidden = YES;
-    
+    self.updateBtn.hidden = YES;
     BOOL eyeOn = [[[NSUserDefaults standardUserDefaults]objectForKey:EYEON]boolValue];
 
     if (eyeOn) {
@@ -390,12 +425,24 @@
 //    NSLog(@"shouldSelectRow==%ld",(long)row);
     return YES;
 }
+- (void)tableView:(NSTableView *)tableView didClickMenuDetail:(NSInteger)row {
+
+//    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://fund.eastmoney.com/%@.html",[[DataManager manger]getCode:row source:_st]]]];
+    
+    FundModel *fm = self.modelsAry[row];
+    FundJZWC *jzwc = [[FundJZWC alloc]initWithWindowNibName:@"FundJZWC"];
+    jzwc.fundCode = [[DataManager manger]getCode:row source:_st];
+    jzwc.fundName = fm.name;
+    [jzwc.window orderFront:nil];
+    [jzwc.window center];
+}
 - (void)tableView:(NSTableView *)tableView didClickMenuDelete:(NSInteger)row {
-//    NSLog(@"didClickMenuDelete===%ld",(long)row);
     [[DataManager manger]deleteData:row source:_st resp:^(id resp) {
-        [self refreshData];
+               [self refreshData];
     }];
 }
+
+
 #pragma mark -------------------- NSControl
 - (BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor {
 //    NSLog(@"textShouldBeginEditing");
@@ -423,8 +470,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
     [self UISet];
     [self loadData];
+    
 }
 
 - (void)viewWillDisappear {

@@ -24,9 +24,14 @@
          if (row >= 0) {
            NSMenu * menu = [[NSMenu alloc]initWithTitle:@"Menu"];
            NSMenuItem * item1 = [[NSMenuItem alloc]initWithTitle:@"删除" action:@selector(menuDelete:) keyEquivalent:@""];
+           NSMenuItem * item2 = [[NSMenuItem alloc]initWithTitle:@"查看详情>" action:@selector(menuDetail:) keyEquivalent:@""];
            item1.tag = row;
+           item2.tag = row;
            item1.target = self;
+           item2.target = self;
            [menu addItem:item1];
+           [menu addItem:item2];
+
            return menu;
         }
 
@@ -39,6 +44,13 @@
     
     if ([self.mhdelegate respondsToSelector:@selector(tableView:didClickMenuDelete:)]) {
         [self.mhdelegate tableView:self didClickMenuDelete:item.tag];
+    }
+    
+}
+- (void)menuDetail:(NSMenuItem *)item {
+    
+    if ([self.mhdelegate respondsToSelector:@selector(tableView:didClickMenuDetail:)]) {
+        [self.mhdelegate tableView:self didClickMenuDetail:item.tag];
     }
     
 }

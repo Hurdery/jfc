@@ -28,20 +28,19 @@
 @property (weak) IBOutlet NSTextField *totolLabel;
 @property (weak) IBOutlet NSTextField *allMoneyLabel;
 @property (weak) IBOutlet NSButton *eyeBtn;
+@property (weak) IBOutlet NSButton *updateBtn;
+
 
 @property(nonatomic,assign) SourceType st;
 /// 总收益
 @property(nonatomic,copy) NSString *zsyStr;
 /// 总投资
 @property(nonatomic,copy) NSString *ztzStr;
-
-
 /// 存放持仓数据
 @property (nonatomic, strong) NSMutableDictionary *ccDic;
 
 /// 自动刷新
 @property (nonatomic, strong) dispatch_source_t timer;
-
 /// 数据
 @property(nonatomic,strong)NSMutableArray <FundModel *>*modelsAry;
 
