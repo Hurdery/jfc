@@ -4,9 +4,9 @@
 ## 基金小大湿
 #### 推荐或关注基金
 ![基基](https://github.com/Hurdery/jfc/blob/master/resource/1.png)
-#### 排序
+#### 右键
 ![基基](https://github.com/Hurdery/jfc/blob/master/resource/2.png)
-#### 删除
+#### 排序
 ![基基](https://github.com/Hurdery/jfc/blob/master/resource/3.png)
 #### 已持仓基金
 ![基基](https://github.com/Hurdery/jfc/blob/master/resource/4.png)
@@ -18,7 +18,7 @@
 * 三大指数一览
 * 添加自选基金
 * 删除自选基金
-* 计算持仓尚日净值
+* 计算持仓上日净值
 * 拖拽排序
 * 手动/自动刷新
 * 最后你以为我是闲的？不，因为目前还没发现哪个mac端软件有此类功能
