@@ -35,6 +35,8 @@
           }
      }
     
+    [self.codeTableV reloadData];
+    
 }
 
 - (IBAction)resetClick:(id)sender {
@@ -68,6 +70,7 @@
           }
           
       }];
+    
 }
 - (IBAction)autuRefreshClick:(NSButton *)sender {
     
@@ -91,7 +94,7 @@
           _st = OtherType;
           sender.title = @"自选源";
           self.eyeBtn.hidden = NO;
-        self.updateBtn.hidden = NO;
+          self.updateBtn.hidden = NO;
     }else{
         _st = RecommedType;
         sender.title = @"推荐源";
@@ -100,6 +103,7 @@
         self.updateBtn.hidden = YES;
     }
        [self refreshData];
+    
 }
 - (IBAction)updateAction:(NSButton *)sender {
     
@@ -110,7 +114,7 @@
     }
     
     sender.enabled = NO;
-    [AlertTool showAlert:@"目前无法实现持仓净值的自动更新，所以需要诸基民每天自动点击更新，为避免出现什么么蛾子，建议每天只点一次，如点多次，导致数据错误（可以自己手动更正)，后果自负！！！目前无法实现持仓净值的自动更新，所以需要诸基民每天自动点击更新，为避免出现什么么蛾子，建议每天只点一次，如点多次，导致数据错误（可以自己手动更正)，后果自负！！！目前无法实现持仓净值的自动更新，所以需要诸基民每天自动点击更新，为避免出现什么么蛾子，建议每天只点一次，如点多次，导致数据错误（可以自己手动更正)，后果自负！！！" actionTitle1:@"每天更新一次！！！" actionTitle2:@"取消" window:[self.view window] action:^(AlertResponse resp) {
+    [AlertTool showAlert:@"单击版目前无法实现持仓净值的自动更新，所以需要诸基民每天自动点击更新，为避免出现什么么蛾子，建议每天只点一次，如点多次，导致数据错误（可以自己手动更正)，后果自负！！！目前无法实现持仓净值的自动更新，所以需要诸基民每天自动点击更新，为避免出现什么么蛾子，建议每天只点一次，如点多次，导致数据错误（可以自己手动更正)，后果自负！！！目前无法实现持仓净值的自动更新，所以需要诸基民每天自动点击更新，为避免出现什么么蛾子，建议每天只点一次，如点多次，导致数据错误（可以自己手动更正)，后果自负！！！" actionTitle1:@"每天更新一次！！！" actionTitle2:@"取消" window:[self.view window] action:^(AlertResponse resp) {
         
         if (resp == FirstResp) {
                  
@@ -121,7 +125,7 @@
                     CGFloat jzStr = [obj floatValue] + [obj floatValue] * [resp floatValue] / 100;
                     [self.ccDic setValue:[NSString stringWithFormat:@"%.2f",jzStr] forKey:key];
                     [[DataManager manger]saveInvestedMoney:self.ccDic];
-                    [self.codeTableV reloadData];
+                    [self refreshData];
                 }];
                 
             }];
@@ -156,7 +160,9 @@
 
 /// 刷新数据
 - (void)refreshData {
-    
+   
+    [self.indicator startAnimation:nil];
+
    [[DataManager manger]loadData:_st resp:^(id  _Nonnull resp) {
           self.modelsAry = resp;
 //           NSLog(@"基数：%ld",self.modelsAry.count);
@@ -165,11 +171,14 @@
           [self.codeTableV reloadData];
         
           [self caculateIncome:self.modelsAry];
+          [self.indicator stopAnimation:nil];
+
     }];
     [NetTool getIndexInfo:^(NSArray <FundModel *>*mArray) {
             
            [self configureUI:mArray];
-                   
+           [self.indicator stopAnimation:nil];
+
     }];
 
 }
@@ -270,21 +279,21 @@
 - (void)configureUI:(NSArray <FundModel *>*)ary {
     
     //上证指数
-    FundModel *szhm = ary[0];
+    FundModel *szm = ary[0];
     //沪深300
     FundModel *hsm = ary[1];
     //深证成指
     FundModel *scm = ary[2];
 
-    self.shangLabel.stringValue = szhm.f2;
+    self.shangLabel.stringValue = szm.f2;
     self.huLabel.stringValue = hsm.f2;
     self.shenLabel.stringValue = scm.f2;
-    self.shang1Label.stringValue = [NSString stringWithFormat:@"%@/%@",szhm.f3,szhm.f4];
+    self.shang1Label.stringValue = [NSString stringWithFormat:@"%@/%@",szm.f3,szm.f4];
     self.hu1Label.stringValue = [NSString stringWithFormat:@"%@/%@",hsm.f3,hsm.f4];
     self.shen1Label.stringValue = [NSString stringWithFormat:@"%@/%@",scm.f3,scm.f4];
     
     
-    if ([szhm.f3 containsString:@"-"]) {
+    if ([szm.f3 containsString:@"-"]) {
         self.shangLabel.textColor = GREENCOLOR;
         self.shang1Label.textColor = GREENCOLOR;
         self.shangImage.image = [NSImage imageNamed:@"down"];
@@ -360,7 +369,15 @@
                 NSString *jcStr =  [self.ccDic objectForKey:model.fundcode];
 
                 if (jcStr.length > 0) {
-                              jct.stringValue = jcStr;
+                    
+                    BOOL eyeOn = [[[NSUserDefaults standardUserDefaults]objectForKey:EYEON]boolValue];
+
+                    if (eyeOn) {
+                        jct.stringValue = jcStr;
+                    }else {
+                        jct.stringValue = @"******";
+                    }
+                    
                 }else {
                               jct.placeholderString = @"基金持有金额";
                 }
@@ -456,9 +473,11 @@
     FundModel *model = self.modelsAry[control.tag];
 //    NSLog(@"control==%ld",control.tag);
     if (jcStr.length > 0) {
-     if (![self isPureFloat:jcStr]) {
+        if ([jcStr containsString:@"*"]) {
+        [AlertTool showAlert:@"不要盲输哦" actionTitle1:@"请打开金额显示" actionTitle2:@"" window:[self.view window] action:nil];
+        }else if (![self isPureFloat:jcStr]) {
         [AlertTool showAlert:@"请输入正确金额[0123456789.]，兄弟" actionTitle1:@"明白" actionTitle2:@"" window:[self.view window] action:nil];
-     }else {
+        }else {
          [self.ccDic setValue:[NSString stringWithFormat:@"%@",jcStr] forKey:model.fundcode];
          [[DataManager manger]saveInvestedMoney:self.ccDic];
          [self refreshData];
@@ -486,6 +505,28 @@
     float val;
  
     return [scan scanFloat:&val] && [scan isAtEnd];
+}
+
+- (NSProgressIndicator *)indicator {
+
+    if (!_indicator) {
+        _indicator = [[NSProgressIndicator alloc]initWithFrame:CGRectZero];
+        _indicator.style = NSProgressIndicatorSpinningStyle;
+
+        _indicator.controlSize = NSControlSizeRegular;
+
+        _indicator.displayedWhenStopped = NO;
+
+        [self.view addSubview:_indicator];
+    }
+
+    return _indicator;
+
+}
+
+- (void)viewDidLayout {
+    [super viewDidLayout];
+    self.indicator.frame = CGRectMake(self.view.frame.size.width / 2 - 25, self.view.frame.size.height / 2 - 25, 50, 50);
 }
 
 @end

@@ -8,7 +8,7 @@
 
 #import "FundJZWC.h"
 #import <WebKit/WebKit.h>
-@interface FundJZWC ()
+@interface FundJZWC ()<WKUIDelegate,WKNavigationDelegate>
 
 @property (weak) IBOutlet WKWebView *webV;
 

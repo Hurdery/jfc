@@ -44,5 +44,6 @@
 /// 数据
 @property(nonatomic,strong)NSMutableArray <FundModel *>*modelsAry;
 
+@property(nonatomic,strong)NSProgressIndicator *indicator;
 @end
 

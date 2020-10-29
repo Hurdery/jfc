@@ -25,7 +25,7 @@
 }
 
 - (void)loadData:(SourceType)st resp:(void(^)(id resp))resp {
-       NSLog(@"发起请求");
+//       NSLog(@"发起请求");
 
        NSArray *sourceA;
        if (st == RecommedType) {
@@ -38,6 +38,7 @@
            
        } else {
            
+           // 去重
            NSMutableArray *resultArrM = [NSMutableArray array];
            NSArray  *originalArr = [[NSUserDefaults standardUserDefaults]objectForKey:jjMyKey];
 
@@ -47,7 +48,7 @@
                   }
               }
            
-           sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjMyKey];
+           sourceA = [NSArray arrayWithArray:resultArrM];
        }
     
        self.modelsAry =  [NSMutableArray array];
@@ -82,7 +83,7 @@
            
            }];
            [self.modelsAry addObjectsFromArray:[self sortHomeModelArray:tempB]];
-           NSLog(@"请求完成");
+//           NSLog(@"请求完成");
            if (resp) {
                resp(self.modelsAry);
            }
