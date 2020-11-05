@@ -52,7 +52,7 @@
       if ([curWeek isEqualToString:@"周一"]) {
          timeStr = [TimeTool getbeforebeforeyesterday];
       }else{
-        timeStr = [TimeTool getLastday];
+         timeStr = [TimeTool getLastday];
       }
     
       [mgr GET:[NSString stringWithFormat:@"http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=%@&&sdate=%@",code,timeStr] parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {

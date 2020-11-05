@@ -117,18 +117,22 @@
     [AlertTool showAlert:@"单击版目前无法实现持仓净值的自动更新，所以需要诸基民每天自动点击更新，为避免出现什么么蛾子，建议每天只点一次，如点多次，导致数据错误（可以自己手动更正)，后果自负！！！目前无法实现持仓净值的自动更新，所以需要诸基民每天自动点击更新，为避免出现什么么蛾子，建议每天只点一次，如点多次，导致数据错误（可以自己手动更正)，后果自负！！！目前无法实现持仓净值的自动更新，所以需要诸基民每天自动点击更新，为避免出现什么么蛾子，建议每天只点一次，如点多次，导致数据错误（可以自己手动更正)，后果自负！！！" actionTitle1:@"每天更新一次！！！" actionTitle2:@"取消" window:[self.view window] action:^(AlertResponse resp) {
         
         if (resp == FirstResp) {
-                 
+           __block int count =0;
             [self.ccDic enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj,  BOOL * _Nonnull stop) {
-                                        
+
                 [NetTool getFundLastJZ:key resp:^(id  _Nonnull resp) {
-                    
+                    count++;
                     CGFloat jzStr = [obj floatValue] + [obj floatValue] * [resp floatValue] / 100;
                     [self.ccDic setValue:[NSString stringWithFormat:@"%.2f",jzStr] forKey:key];
                     [[DataManager manger]saveInvestedMoney:self.ccDic];
-                    [self refreshData];
+                    if (count == self.ccDic.count - 1 ) {
+                        // 得出最后一个持仓净值数据，更新数据源
+                        [self refreshData];
+                    }
                 }];
                 
             }];
+
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(8 *60 *60 *NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                                sender.enabled = YES;
             });
@@ -317,7 +321,7 @@
            self.shenImage.image = [NSImage imageNamed:@"down"];
 
     } else {
-           self.huLabel.textColor = [NSColor redColor];
+           self.shenLabel.textColor = [NSColor redColor];
            self.shen1Label.textColor = [NSColor redColor];
            self.shenImage.image = [NSImage imageNamed:@"up"];
     }
