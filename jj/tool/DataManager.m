@@ -64,9 +64,12 @@
                    [NetTool getFundInfo:obj complete:^(id  _Nonnull resp) {
                      [tempA addObject:resp];
                      dispatch_group_leave(group);
+
+                   } fail:^(id  _Nonnull resp) {
+                       dispatch_group_leave(group);
                    }];
            });
-           
+
        }];
            
        dispatch_group_notify(group, dispatch_get_main_queue(), ^{
@@ -85,6 +88,21 @@
            [self.modelsAry addObjectsFromArray:[self sortHomeModelArray:tempB]];
 //           NSLog(@"请求完成");
            if (resp) {
+
+               // 可能有的基金未能查询到相关信息，请求完成之后更新本地数据，保持数据同步
+               NSMutableArray *tempC = [NSMutableArray array];
+               [self.modelsAry enumerateObjectsUsingBlock:^(FundModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                    [tempC addObject:obj.fundcode];
+               }];
+               if (st == RecommedType) {
+
+                [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempC] forKey:jjKey];
+
+               } else {
+
+                [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempC] forKey:jjMyKey];
+               }
+
                resp(self.modelsAry);
            }
            
@@ -111,7 +129,7 @@
            return;
        }
     
-      
+    
        NSMutableArray *tempA = [NSMutableArray arrayWithArray:sourceA];
 
        [NetTool getFundInfo:codeStr complete:^(id  _Nonnull resp) {
@@ -134,25 +152,31 @@
                result(nil,AlertNull);
            }
            
+       } fail:^(id  _Nonnull resp) {
+
        }];
         
 }
 - (void)deleteData:(NSInteger)row source:(SourceType)st resp:(void(^)(id resp))resp {
-    
+
     NSArray *sourceA;
        if (st == RecommedType) {
            sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjKey];
        } else {
            sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjMyKey];
        }
-    
+
+
     NSMutableArray *mjja = [NSMutableArray arrayWithArray:sourceA];
     [mjja removeObjectAtIndex:row];
+
     if (st == RecommedType) {
               [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:mjja] forKey:jjKey];
           } else {
               [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:mjja] forKey:jjMyKey];
           }
+    [[NSUserDefaults standardUserDefaults]synchronize];
+
     resp(@"delete");
     
 }

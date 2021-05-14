@@ -9,7 +9,6 @@
 #import "ViewController.h"
 #import "AlertTool.h"
 #import "FundJZWC.h"
-
 #define GREENCOLOR [NSColor colorWithDeviceRed:140/255.0 green:212/255.0 blue:144/255.0 alpha:1]
 #define EYEON @"eyeon"
 
@@ -27,6 +26,7 @@
               sender.image = [NSImage imageNamed:@"eye"];
               self.allMoneyLabel.stringValue = self.ztzStr;
               self.totolLabel.stringValue = self.zsyStr;
+
           }else{
               [[NSUserDefaults standardUserDefaults]setBool:NO forKey:EYEON];
              sender.image = [NSImage imageNamed:@"eey"];
@@ -92,12 +92,12 @@
     sender.accessibilitySelected = !sender.accessibilitySelected;
     if (sender.accessibilitySelected) {
           _st = OtherType;
-          sender.title = @"自选源";
+          sender.title = @"持有区";
           self.eyeBtn.hidden = NO;
           self.updateBtn.hidden = NO;
     }else{
         _st = RecommedType;
-        sender.title = @"推荐源";
+        sender.title = @"观察区";
         self.totolLabel.stringValue = @"刮开有奖";
         self.eyeBtn.hidden = YES;
         self.updateBtn.hidden = YES;
@@ -383,7 +383,7 @@
                     }
                     
                 }else {
-                              jct.placeholderString = @"基金持有金额";
+                        jct.placeholderString = @"基金持有金额";
                 }
             }
             [view addSubview:jct];
@@ -449,7 +449,7 @@
 - (void)tableView:(NSTableView *)tableView didClickMenuDetail:(NSInteger)row {
 
 //    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://fund.eastmoney.com/%@.html",[[DataManager manger]getCode:row source:_st]]]];
-    
+    NSLog(@"didClickMenuDetail===%d",row);
     FundModel *fm = self.modelsAry[row];
     FundJZWC *jzwc = [[FundJZWC alloc]initWithWindowNibName:@"FundJZWC"];
     jzwc.fundCode = [[DataManager manger]getCode:row source:_st];
@@ -458,6 +458,8 @@
     [jzwc.window center];
 }
 - (void)tableView:(NSTableView *)tableView didClickMenuDelete:(NSInteger)row {
+    NSLog(@"didClickMenuDelete===%d",row);
+
     [[DataManager manger]deleteData:row source:_st resp:^(id resp) {
                [self refreshData];
     }];

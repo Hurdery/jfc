@@ -17,26 +17,30 @@
 //http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=320007&page=1&per=30
 //http://fund.eastmoney.com/320007.html
 @implementation NetTool
-+ (void)getFundInfo:(NSString *)code complete:(void(^)(id resp))resp {
++ (void)getFundInfo:(NSString *)code complete:(void(^)(id resp))resp fail:(void(^)(id resp))failBlock {
     
       AFHTTPSessionManager *mgr = [AFHTTPSessionManager manager];
       mgr.requestSerializer = [AFHTTPRequestSerializer serializer];
       mgr.responseSerializer = [AFHTTPResponseSerializer serializer];
       mgr.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/x-javascript",nil];
       [mgr GET:[NSString stringWithFormat:@"%@%@.js",tturl,code] parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-          
+
            NSString *string = [[[[[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding] stringByReplacingOccurrencesOfString:@"(" withString:@""]stringByReplacingOccurrencesOfString:@")" withString:@""]stringByReplacingOccurrencesOfString:@"jsonpgz" withString:@""]stringByReplacingOccurrencesOfString:@";" withString:@""];
+//          NSLog(@"responseObject===%@",string);
+
           NSDictionary *dic = [self dictionaryWithJsonString:string];
           
           if (dic) {
              FundModel *fm = [[FundModel alloc]initWithDic:dic];
 //             fm.refreshtime = [self getCurrentTimes];
              resp(fm);
+          }else {
+              NSLog(@"查询基金：%@ 相关信息为空：",code);
+              failBlock(@"error");
           }
-//          NSLog(@"responseObject===%@",string);
       } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
           NSLog(@"NSError===%@",error);
-          [AlertTool showAlert:@"哎呀呀，搜寻基码出错了" actionTitle1:@"换个基码" actionTitle2:@"" window:[NSApplication sharedApplication].keyWindow action:nil];
+          [AlertTool showAlert:@"哎呀，搜寻基码出错了" actionTitle1:@"换个基码" actionTitle2:@"" window:[NSApplication sharedApplication].keyWindow action:nil];
       }];
     
 }
@@ -100,18 +104,18 @@
 
 + (NSDictionary *)dictionaryWithJsonString:(NSString *)jsonString
 {
-    if (jsonString == nil) {
+    if (jsonString == nil ||[jsonString length] < 1) {
         return nil;
     }
 
     NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
     NSError *err;
     NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData
-                                                        options:NSJSONReadingMutableContainers
+                                                        options:NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
                                                           error:&err];
     if(err)
     {
-        NSLog(@"json解析失败：%@",err);
+        NSLog(@"json解析失败：%@=====%@",err,jsonString);
         return nil;
     }
     return dic;
