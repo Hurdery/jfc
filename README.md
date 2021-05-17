@@ -2,7 +2,7 @@
 苹果Mac端基金管理查看平台（数据来源天天基金）
 
 ## 基金小大湿
-#### 待观察或已关注基金
+#### 待观察或已持有基金
 ![基基](https://github.com/Hurdery/jfc/blob/master/resource/1.png)
 #### 右键
 ![基基](https://github.com/Hurdery/jfc/blob/master/resource/2.png)
@@ -27,11 +27,7 @@
 
 **1. 普通安装**
 
-<<<<<<< HEAD
 * 直接安dmg或双击'基富贵'
-=======
-* 直接双击dmg，然后看下桌面有没有多出个磁盘文件打开。
->>>>>>> f6d9bd88fcbd1789cae0295d2ff68e38e5355ad8
 
 **2. 非普通安装**
 
