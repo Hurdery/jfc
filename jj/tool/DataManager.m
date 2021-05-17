@@ -32,10 +32,11 @@
            sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjKey];
               
               if (sourceA.count < 1) {
-               NSArray *jjA = @[@"004997",@"001475",@"006266",@"004698",@"006269",@"001838",@"005609",@"004069",@"004070",@"002251"];
-               [[NSUserDefaults standardUserDefaults]setObject:jjA forKey:jjKey];
+                  NSArray *jjA = @[@"003834",@"005968",@"006299",@"002190",@"540008",@"090018",@"001644",@"006049",@"161725",@"001951"];
+                  [[NSUserDefaults standardUserDefaults]setObject:jjA forKey:jjKey];
+                  sourceA = jjA;
             }
-           
+
        } else {
            
            // 去重
@@ -57,20 +58,20 @@
        dispatch_group_t group = dispatch_group_create();
        dispatch_queue_t jjqueue = dispatch_get_global_queue(0, 0);
 
-    [sourceA enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-           
-           dispatch_group_enter(group);
-           dispatch_group_async(group, jjqueue, ^{
-                   [NetTool getFundInfo:obj complete:^(id  _Nonnull resp) {
-                     [tempA addObject:resp];
-                     dispatch_group_leave(group);
+        [sourceA enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
 
-                   } fail:^(id  _Nonnull resp) {
-                       dispatch_group_leave(group);
-                   }];
-           });
+               dispatch_group_enter(group);
+               dispatch_group_async(group, jjqueue, ^{
+                       [NetTool getFundInfo:obj complete:^(id  _Nonnull resp) {
+                         [tempA addObject:resp];
+                         dispatch_group_leave(group);
 
-       }];
+                       } fail:^(id  _Nonnull resp) {
+                           dispatch_group_leave(group);
+                       }];
+               });
+
+           }];
            
        dispatch_group_notify(group, dispatch_get_main_queue(), ^{
 
@@ -201,7 +202,7 @@
 - (void)resetDefaultData:(SourceType)st resp:(void(^)(id resp))resp {
     
     if (st == RecommedType) {
-      NSArray *jjA = @[@"004997",@"001475",@"006266",@"004698",@"006269",@"001838",@"005609",@"004069",@"004070",@"002251"];
+        NSArray *jjA = @[@"003834",@"005968",@"006299",@"002190",@"540008",@"090018",@"001644",@"006049",@"161725",@"001951"];
     [[NSUserDefaults standardUserDefaults]setObject:jjA forKey:jjKey];
           
            resp(@"reset");
