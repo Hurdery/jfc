@@ -2,36 +2,32 @@
 苹果Mac端基金管理查看平台（数据来源天天基金）
 
 ## 基金小大湿
-#### 待观察或已关注基金
-![基基](https://github.com/Hurdery/jfc/blob/master/resource/1.png)
-#### 右键
-![基基](https://github.com/Hurdery/jfc/blob/master/resource/2.png)
-#### 排序
-![基基](https://github.com/Hurdery/jfc/blob/master/resource/3.png)
-#### 已持仓基金
-![基基](https://github.com/Hurdery/jfc/blob/master/resource/4.png)
+#### 榜单区
+![基基](https://github.com/Hurdery/jfc/blob/master/resource/榜单.png)
+#### 观察区
+![基基](https://github.com/Hurdery/jfc/blob/master/resource/观察.png)
+#### 持仓区
+![基基](https://github.com/Hurdery/jfc/blob/master/resource/持仓.png)
 
-### 啥功能啊
 
-* 天天基金收益榜十一览
-* 自持仓位基金一览
+### 都有啥功能啊
+
+* 天天基金月收益榜三十全览
+* 待考察基金一览
+* 已买入基金一览
 * 三大指数一览
 * 添加自选基金
 * 删除自选基金
-* 计算持仓上日净值
 * 拖拽排序
+* 计算上日持仓净值
 * 手动/自动刷新
-* 最后你以为我是闲的？不，因为目前还没发现哪个mac端软件有此类功能
+* 最后你以为我是闲的？不，因为目前还没发现哪个Mac端软件有此类功能
 
 ### 安装
 
 **1. 普通安装**
 
-<<<<<<< HEAD
 * 直接安dmg或双击'基富贵'
-=======
-* 直接双击dmg，然后看下桌面有没有多出个磁盘文件打开。
->>>>>>> f6d9bd88fcbd1789cae0295d2ff68e38e5355ad8
 
 **2. 非普通安装**
 
@@ -41,8 +37,11 @@
 
 ### 使用说明书
 
-为了个人财产隐私保护，本luer设计了两套数据源模式，一套显示自己关注的或别人推荐（待观察）的基金，一套显示自己已经持仓的基金，并且可以根据持仓金额，
-持仓金额，持仓金额，不是份额，依据实时估值计算出当日大概收益。咋切换呢？很明显，点页面上的（观察区\持有区）按钮!
+本luer设计了三套数据源模式：
+#### 榜单区：数据源自天天基金月收益榜单前三十位，供大家分析整体基市趋势行情
+#### 观察区：想买入但是未买入的基金，可以放在这里相机而行
+#### 持有区：自己已经买入的基金，可输入持仓金额（是钱不是份额）查看实时预估收益
+* 注：三套数据源相互隔离，互不影响
 
 --- 
 
@@ -56,11 +55,12 @@
 
 #### 热心基民交流群
 
-![基群](https://github.com/Hurdery/jfc/blob/master/resource/%E7%83%AD%E5%BF%83%E5%9F%BA%E6%B0%91.jpg)
+![基群](https://github.com/Hurdery/jfc/blob/master/resource/热心基民.jpg)
 
 --- 
 
-#### 啥？听说大涨了？？😏
+#### 啥？听说大涨了？？请作者喝杯阔落😏
+![kuoluo](https://github.com/Hurdery/jfc/blob/master/resource/kuoluo.png)
 
-来吧，把你的致富秘籍分享给大家吧！
+
 
