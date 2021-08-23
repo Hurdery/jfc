@@ -7,7 +7,7 @@
 #### 观察区
 ![基基](https://github.com/Hurdery/jfc/blob/master/resource/观察.png)
 #### 持仓区
-![基基](https://github.com/Hurdery/jfc/blob/master/resource/持仓.png)
+![基基](https://github.com/Hurdery/jfc/blob/master/resource/持有.png)
 
 
 ### 都有啥功能啊
