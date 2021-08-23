@@ -7,8 +7,11 @@
 //
 
 #import "DataManager.h"
+/// 观察区基金
 #define jjKey @"jjkey"
+/// 持有基金
 #define jjMyKey @"jjMyKey"
+/// 持仓金额
 #define jcKey @"jcKey"
 
 @implementation DataManager
@@ -25,20 +28,32 @@
 }
 
 - (void)loadData:(SourceType)st resp:(void(^)(id resp))resp {
-//       NSLog(@"发起请求");
 
        NSArray *sourceA;
-       if (st == RecommedType) {
+       if (st == ObType) {
+
            sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjKey];
-              
+
               if (sourceA.count < 1) {
                   NSArray *jjA = @[@"003834",@"005968",@"006299",@"002190",@"540008",@"090018",@"001644",@"006049",@"161725",@"001951"];
                   [[NSUserDefaults standardUserDefaults]setObject:jjA forKey:jjKey];
-                  sourceA = jjA;
-            }
 
-       } else {
-           
+                  sourceA = jjA;
+              } else {
+                  NSMutableArray *resultArrM = [NSMutableArray array];
+                  NSArray  *originalArr = sourceA;
+
+                     for (NSString *item in originalArr) {
+                         if (![resultArrM containsObject:item]) {
+                           [resultArrM addObject:item];
+                         }
+                     }
+
+                  sourceA = [NSArray arrayWithArray:resultArrM];
+              }
+
+
+       } else if (st == OwnType) {
            // 去重
            NSMutableArray *resultArrM = [NSMutableArray array];
            NSArray  *originalArr = [[NSUserDefaults standardUserDefaults]objectForKey:jjMyKey];
@@ -50,8 +65,14 @@
               }
            
            sourceA = [NSArray arrayWithArray:resultArrM];
+       } else {
+
+           [NetTool getFundRank:^(id  _Nonnull rankA) {
+             resp(rankA);
+           }];
+           return;
        }
-    
+
        self.modelsAry =  [NSMutableArray array];
        NSMutableArray *tempA = [NSMutableArray array];
        NSMutableArray *tempB = [NSMutableArray array];
@@ -74,7 +95,6 @@
            }];
            
        dispatch_group_notify(group, dispatch_get_main_queue(), ^{
-
            // 请求完成后排序
            [tempA enumerateObjectsUsingBlock:^(FundModel * _Nonnull jjModel, NSUInteger idx, BOOL * _Nonnull stop) {
                
@@ -95,13 +115,14 @@
                [self.modelsAry enumerateObjectsUsingBlock:^(FundModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
                     [tempC addObject:obj.fundcode];
                }];
-               if (st == RecommedType) {
+               if (st == ObType) {
 
                 [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempC] forKey:jjKey];
 
-               } else {
+               } else if (st == OwnType) {
 
                 [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempC] forKey:jjMyKey];
+
                }
 
                resp(self.modelsAry);
@@ -114,22 +135,21 @@
 - (void)addData:(NSString *)codeStr source:(SourceType)st resp:(void(^)(id result,AlertType at))result {
     
     NSArray *sourceA;
-    if (st == RecommedType) {
+    if (st == ObType) {
         sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjKey];
     } else {
         sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjMyKey];
     }
 
-       if (codeStr.length < 1) {
-           result(nil,AlertEmpty);
-           return;
-        }
+    if (codeStr.length < 1) {
+        result(nil,AlertEmpty);
+        return;
+    }
        
-       if ([sourceA containsObject:codeStr]) {
-           result(nil,AlertRepeat);
-           return;
-       }
-    
+    if ([sourceA containsObject:codeStr]) {
+        result(nil,AlertRepeat);
+        return;
+    }
     
        NSMutableArray *tempA = [NSMutableArray arrayWithArray:sourceA];
 
@@ -139,7 +159,7 @@
                
                [self.modelsAry addObject:resp];
                [tempA insertObject:codeStr atIndex:0];
-               if (st == RecommedType) {
+               if (st == ObType) {
                      [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempA] forKey:jjKey];
                  } else {
                      [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempA] forKey:jjMyKey];
@@ -161,17 +181,16 @@
 - (void)deleteData:(NSInteger)row source:(SourceType)st resp:(void(^)(id resp))resp {
 
     NSArray *sourceA;
-       if (st == RecommedType) {
+       if (st == ObType) {
            sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjKey];
        } else {
            sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjMyKey];
        }
 
-
     NSMutableArray *mjja = [NSMutableArray arrayWithArray:sourceA];
     [mjja removeObjectAtIndex:row];
 
-    if (st == RecommedType) {
+    if (st == ObType) {
               [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:mjja] forKey:jjKey];
           } else {
               [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:mjja] forKey:jjMyKey];
@@ -184,12 +203,11 @@
 - (NSString *)getCode:(NSInteger)row source:(SourceType)st{
     
           NSArray *sourceA;
-          if (st == RecommedType) {
+          if (st == ObType) {
               sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjKey];
           } else {
               sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjMyKey];
           }
-    
          return [sourceA objectAtIndex:row];
     
 }
@@ -201,7 +219,7 @@
 /// @param resp <#resp description#>
 - (void)resetDefaultData:(SourceType)st resp:(void(^)(id resp))resp {
     
-    if (st == RecommedType) {
+    if (st == ObType) {
         NSArray *jjA = @[@"003834",@"005968",@"006299",@"002190",@"540008",@"090018",@"001644",@"006049",@"161725",@"001951"];
     [[NSUserDefaults standardUserDefaults]setObject:jjA forKey:jjKey];
           
@@ -236,7 +254,7 @@
 
     }];
     
-    if (st == RecommedType) {
+    if (st == ObType) {
         [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempAry] forKey:jjKey];
     } else {
         [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempAry] forKey:jjMyKey];

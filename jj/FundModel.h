@@ -32,6 +32,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic,assign)NSInteger sort;
 /// 基持
 @property(nonatomic,copy)NSString *jc;
+/// 规模
+@property(nonatomic,copy)NSString *ENDNAV;
+/// 周涨幅
+@property(nonatomic,copy)NSString *SYL_Z;
+/// 月涨幅
+@property(nonatomic,copy)NSString *SYL_Y;
+/// 年涨幅
+@property(nonatomic,copy)NSString *SYL_1N;
+/// 日涨幅
+@property(nonatomic,copy)NSString *RZDF;
+/// 上日
+@property(nonatomic,copy)NSString *FSRQ;
+/// 区类型  2====>榜单
+@property(nonatomic,assign)NSInteger zoneType;
 
 /// 指数
 @property(nonatomic,copy)NSString *f2;
@@ -40,6 +54,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (instancetype)initWithDic:(NSDictionary *)dic;
+
+/// 榜单区
+/// @param dic <#dic description#>
+- (instancetype)initWithRankDic:(NSDictionary *)dic;
 
 @end
 

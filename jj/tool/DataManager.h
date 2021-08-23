@@ -16,8 +16,9 @@ typedef enum : NSUInteger {
 } AlertType;
 
 typedef enum : NSUInteger {
-    RecommedType, // 自选 + 推荐的数据
-    OtherType, // 自定义，如自己持仓部分
+    RankType, // 榜单前三十数据
+    ObType, //  观察的数据
+    OwnType, // 拥有的数据
 } SourceType;
 
 /// <#Description#>

@@ -30,6 +30,7 @@
 @property (weak) IBOutlet NSButton *eyeBtn;
 @property (weak) IBOutlet NSButton *updateBtn;
 
+@property(nonatomic,assign) NSInteger sourceIndex;
 
 @property(nonatomic,assign) SourceType st;
 /// 总收益

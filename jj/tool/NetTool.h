@@ -9,6 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "FundModel.h"
 #import "TimeTool.h"
+#import "JTool.h"
+#import "AFNetworking.h"
+#import "NetClient.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -29,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// 获取上天净值
 /// @param code <#code description#>
 + (void)getFundLastJZ:(NSString *)code resp:(void(^)(id resp))resp;
+
++ (void)getFundRank:(void(^)(id resp))resp;
 
 @end
 
