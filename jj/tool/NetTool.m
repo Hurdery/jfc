@@ -37,7 +37,6 @@
     
 }
 
-
 + (void)getFundLastJZ:(NSString *)code resp:(void(^)(id resp))resp {
 
       NSString *timeStr ;
@@ -69,6 +68,7 @@
                   [AlertTool showAlert:@"哎呀呀，获取净值出错了" actionTitle1:@"稍后再试" actionTitle2:@"" window:[NSApplication sharedApplication].keyWindow action:nil];
               }];
 }
+
 + (void)getIndexInfo:(void(^)(id resp))resp {
 
           [[NetClient shareJsonInstance] GET:@"https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f2,f3,f4,f12,f14&secids=1.000001,1.000300,0.399006" parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
@@ -86,6 +86,7 @@
           }];
 
 }
+
 + (void)getFundRank:(void(^)(id resp))resp {
 
     [[NetClient shareJsonInstance] GET:[NSString stringWithFormat:@"https://fundmobapi.eastmoney.com/FundMNewApi/FundMNRank?FundType=0&SortColumn=SYL_Y&Sort=desc&pageIndex=1&pageSize=30&BUY=true&CompanyId=&LevelOne=&LevelTwo=&ISABNORMAL=true&DISCOUNT=&RISKLEVEL=&ENDNAV=&RLEVEL_SZ=&ESTABDATE=&TOPICAL=&CLTYPE=&DataConstraintType=0&GTOKEN=&product=EFund&passportutoken=&deviceid=%@&plat=Iphone&passportctoken=&version=6.4.7",[NSUUID UUID].UUIDString] parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
@@ -103,7 +104,5 @@
     }];
 
 }
-
-
 
 @end

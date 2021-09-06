@@ -103,11 +103,17 @@
         self.allMoneyLabel.textColor = [NSColor lightGrayColor];
         self.eyeBtn.hidden = YES;
         self.updateBtn.hidden = YES;
+        self.codeTf.editable = YES;
+        self.codeTf.placeholderString = @"基码";
+        self.codeTf.stringValue = @"";
     }else if (self.sourceIndex == 2) {
         _st = OwnType;
         sender.title = @"持有区";
         self.eyeBtn.hidden = NO;
         self.updateBtn.hidden = NO;
+        self.codeTf.editable = YES;
+        self.codeTf.placeholderString = @"基码";
+        self.codeTf.stringValue = @"";
 
     }else {
         self.sourceIndex = 0;
@@ -119,6 +125,9 @@
         self.allMoneyLabel.textColor = [NSColor lightGrayColor];
         self.eyeBtn.hidden = YES;
         self.updateBtn.hidden = YES;
+        self.codeTf.editable = NO;
+        self.codeTf.placeholderString = @"\\";
+        self.codeTf.stringValue = @"";
 
     }
     self.sourceIndex ++;
@@ -522,7 +531,12 @@
 
     FundModel *fm = self.modelsAry[row];
     FundJZWC *jzwc = [[FundJZWC alloc]initWithWindowNibName:@"FundJZWC"];
-    jzwc.fundCode = [[DataManager manger]getCode:row source:_st];
+    if (_st == RankType) {
+        FundModel *model = self.modelsAry[row];
+        jzwc.fundCode = model.fundcode;
+    }else {
+        jzwc.fundCode = [[DataManager manger]getCode:row source:_st];
+    }
     jzwc.fundName = fm.name;
     [jzwc.window orderFront:nil];
     [jzwc.window center];
@@ -566,11 +580,15 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.sourceIndex = 1;
+    [self initData];
     [self UISet];
     [self loadData];
 }
-
+- (void)initData {
+    self.sourceIndex = 1;
+    self.codeTf.editable = NO;
+    self.codeTf.placeholderString = @"\\";
+}
 - (void)viewWillDisappear {
     dispatch_source_cancel(self.timer);
 }

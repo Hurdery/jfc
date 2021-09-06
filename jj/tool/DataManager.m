@@ -137,7 +137,7 @@
     NSArray *sourceA;
     if (st == ObType) {
         sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjKey];
-    } else {
+    } else if (st == OwnType)  {
         sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjMyKey];
     }
 
@@ -161,7 +161,7 @@
                [tempA insertObject:codeStr atIndex:0];
                if (st == ObType) {
                      [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempA] forKey:jjKey];
-                 } else {
+                 } else if (st == OwnType) {
                      [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempA] forKey:jjMyKey];
                  }
 
@@ -180,10 +180,12 @@
 }
 - (void)deleteData:(NSInteger)row source:(SourceType)st resp:(void(^)(id resp))resp {
 
-    NSArray *sourceA;
+    if(st == RankType) return;;
+
+       NSArray *sourceA;
        if (st == ObType) {
            sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjKey];
-       } else {
+       } else if (st == OwnType) {
            sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjMyKey];
        }
 
@@ -191,10 +193,10 @@
     [mjja removeObjectAtIndex:row];
 
     if (st == ObType) {
-              [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:mjja] forKey:jjKey];
-          } else {
-              [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:mjja] forKey:jjMyKey];
-          }
+        [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:mjja] forKey:jjKey];
+    } else if (st == OwnType) {
+        [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:mjja] forKey:jjMyKey];
+    }
     [[NSUserDefaults standardUserDefaults]synchronize];
 
     resp(@"delete");
@@ -205,7 +207,7 @@
           NSArray *sourceA;
           if (st == ObType) {
               sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjKey];
-          } else {
+          } else if (st == OwnType) {
               sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjMyKey];
           }
          return [sourceA objectAtIndex:row];
@@ -221,10 +223,10 @@
     
     if (st == ObType) {
         NSArray *jjA = @[@"003834",@"005968",@"006299",@"002190",@"540008",@"090018",@"001644",@"006049",@"161725",@"001951"];
-    [[NSUserDefaults standardUserDefaults]setObject:jjA forKey:jjKey];
+        [[NSUserDefaults standardUserDefaults]setObject:jjA forKey:jjKey];
           
            resp(@"reset");
-    } else {
+    } else if (st == OwnType) {
          [[NSUserDefaults standardUserDefaults]removeObjectForKey:jjMyKey];
 
          resp(@"reset");
@@ -256,7 +258,7 @@
     
     if (st == ObType) {
         [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempAry] forKey:jjKey];
-    } else {
+    } else if (st == OwnType){
         [[NSUserDefaults standardUserDefaults]setObject:[NSArray arrayWithArray:tempAry] forKey:jjMyKey];
     }
     
