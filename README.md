@@ -1,4 +1,4 @@
-# jfc
+# 基发财
 苹果Mac端基金管理查看平台（数据来源天天基金）
 
 ## 基金小大湿
@@ -59,7 +59,7 @@
 
 --- 
 
-#### 啥？听说大涨了？？请作者喝杯阔落😏
+#### 啥？听说涨停了？？请作者喝杯阔落😏
 ![kuoluo](https://github.com/Hurdery/jfc/blob/master/resource/kuoluo.png)
 
 ##### 韭菜日记
