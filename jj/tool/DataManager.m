@@ -17,18 +17,15 @@
 @implementation DataManager
 
 + (instancetype)manger {
-    
     static DataManager *manager = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         manager = [[DataManager alloc]init];
     });
     return manager;
-    
 }
 
 - (void)loadData:(SourceType)st resp:(void(^)(id resp))resp {
-
        NSArray *sourceA;
        if (st == ObType) {
 
@@ -127,13 +124,11 @@
 
                resp(self.modelsAry);
            }
-           
       });
     
-    
 }
+
 - (void)addData:(NSString *)codeStr source:(SourceType)st resp:(void(^)(id result,AlertType at))result {
-    
     NSArray *sourceA;
     if (st == ObType) {
         sourceA = [[NSUserDefaults standardUserDefaults]objectForKey:jjKey];
@@ -176,10 +171,9 @@
        } fail:^(id  _Nonnull resp) {
 
        }];
-        
 }
-- (void)deleteData:(NSInteger)row source:(SourceType)st resp:(void(^)(id resp))resp {
 
+- (void)deleteData:(NSInteger)row source:(SourceType)st resp:(void(^)(id resp))resp {
     if(st == RankType) return;;
 
        NSArray *sourceA;
@@ -200,7 +194,6 @@
     [[NSUserDefaults standardUserDefaults]synchronize];
 
     resp(@"delete");
-    
 }
 - (NSString *)getCode:(NSInteger)row source:(SourceType)st{
     
@@ -213,10 +206,12 @@
          return [sourceA objectAtIndex:row];
     
 }
+
 - (void)clearData{
     [[NSUserDefaults standardUserDefaults]removeObjectForKey:jjKey];
 
 }
+
 /// 默认天天基金榜十
 /// @param resp <#resp description#>
 - (void)resetDefaultData:(SourceType)st resp:(void(^)(id resp))resp {
@@ -233,6 +228,7 @@
     }
     
 }
+
 - (NSArray *)sortHomeModelArray:(NSArray *)tempAry {
     
     NSArray *sortedArray = [tempAry sortedArrayUsingComparator:^NSComparisonResult(FundModel *obj1, FundModel *obj2) {
@@ -246,6 +242,7 @@
     
     return sortedArray;
 }
+
 - (void)dragReset:(SourceType)st modelsAry:(NSArray *)modelsAry {
     
     NSMutableArray *tempAry = [NSMutableArray arrayWithCapacity:modelsAry.count];
@@ -263,9 +260,11 @@
     }
     
 }
+
 - (void)saveInvestedMoney:(NSMutableDictionary *)mdic {
     [[NSUserDefaults standardUserDefaults]setObject:[NSDictionary dictionaryWithDictionary:mdic] forKey:jcKey];
 }
+
 - (NSDictionary *)getInvestedMoney {
     return  [[NSUserDefaults standardUserDefaults]objectForKey:jcKey];
 }

@@ -39,12 +39,11 @@
 @property(nonatomic,copy) NSString *ztzStr;
 /// 存放持仓数据
 @property (nonatomic, strong) NSMutableDictionary *ccDic;
-
 /// 自动刷新
 @property (nonatomic, strong) dispatch_source_t timer;
 /// 数据
 @property(nonatomic,strong)NSMutableArray <FundModel *>*modelsAry;
-
 @property(nonatomic,strong)NSProgressIndicator *indicator;
+
 @end
 

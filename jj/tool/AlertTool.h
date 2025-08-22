@@ -17,5 +17,6 @@ typedef NS_ENUM(NSUInteger, AlertResponse) {
 
 @interface AlertTool : NSObject
 +(void)showAlert:(NSString *)msg  actionTitle1:(NSString *)actionTitle1 actionTitle2:(NSString *)actionTitle2 window:(NSWindow *)window action:(void(^)(AlertResponse resp))action;
+
 @end
 

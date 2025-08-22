@@ -9,21 +9,20 @@
 #import "NetClient.h"
 
 @implementation NetClient
-+ (instancetype)shareHttpInstance {
 
++ (instancetype)shareHttpInstance {
     static NetClient *manager = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         manager = [[self alloc] init];
         manager.requestSerializer = [AFHTTPRequestSerializer serializer];
         manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-        [manager.responseSerializer setAcceptableContentTypes:[NSSet setWithObjects:@"application/json", @"text/json", @"text/javascript",@"text/html",@"text/plain",@"application/x-javascript",nil]];
+        [manager.responseSerializer setAcceptableContentTypes:[NSSet setWithObjects:@"application/json", @"text/json", @"text/javascript",@"text/html",@"text/plain",@"application/x-javascript",@"application/javascript",nil]];
     });
     return manager;
-
 }
-+ (instancetype)shareJsonInstance {
 
++ (instancetype)shareJsonInstance {
     static NetClient *manager = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -33,6 +32,5 @@
         [manager.responseSerializer setAcceptableContentTypes:[NSSet setWithObjects:@"application/json", @"text/json", @"text/javascript",@"text/html",@"text/plain",@"application/x-javascript",nil]];
     });
     return manager;
-
 }
 @end

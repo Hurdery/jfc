@@ -13,7 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface FundJZWC : NSWindowController
 @property(nonatomic,copy)NSString *fundCode;
 @property(nonatomic,copy)NSString *fundName;
-
 @end
 
 NS_ASSUME_NONNULL_END

@@ -17,7 +17,6 @@
 /// 设置右键菜单
 /// @param event <#event description#>
 - (NSMenu *)menuForEvent:(NSEvent *)event{
-    
     if (event.type == NSEventTypeRightMouseDown) {
         NSPoint menuPoint = [self convertPoint:[event locationInWindow] fromView:nil];
         NSInteger row = [self rowAtPoint:menuPoint];
@@ -31,27 +30,21 @@
            item2.target = self;
            [menu addItem:item1];
            [menu addItem:item2];
-
            return menu;
         }
-
     }
-    
     return nil;
-    
 }
+
 - (void)menuDelete:(NSMenuItem *)item {
-    
     if ([self.mhdelegate respondsToSelector:@selector(tableView:didClickMenuDelete:)]) {
         [self.mhdelegate tableView:self didClickMenuDelete:item.tag];
     }
-    
 }
+
 - (void)menuDetail:(NSMenuItem *)item {
-    
     if ([self.mhdelegate respondsToSelector:@selector(tableView:didClickMenuDetail:)]) {
         [self.mhdelegate tableView:self didClickMenuDetail:item.tag];
     }
-    
 }
 @end

@@ -62,5 +62,11 @@
 #### 啥？听说大涨了？？请作者喝杯阔落😏
 ![kuoluo](https://github.com/Hurdery/jfc/blob/master/resource/kuoluo.png)
 
+##### 韭菜日记
+
+乙巳年闰六月廿九  晴
+大刀割不尽，牛来韭又生。
+
+
 
 

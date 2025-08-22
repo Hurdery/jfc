@@ -65,5 +65,6 @@ typedef enum : NSUInteger {
 
 /// 获取持仓数
 - (NSDictionary *)getInvestedMoney;
+
 @end
 
