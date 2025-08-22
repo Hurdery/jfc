@@ -66,7 +66,7 @@
 
 乙巳年闰六月廿九  晴  
 大刀割不尽，牛来韭又生。  
-https://github.com/Hurdery/jfc/blob/master/resource/2025.8.22.jpg
+![基基](https://github.com/Hurdery/jfc/blob/master/resource/2025.8.22.jpg)
 
 
 
