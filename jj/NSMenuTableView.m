@@ -47,4 +47,5 @@
         [self.mhdelegate tableView:self didClickMenuDetail:item.tag];
     }
 }
+
 @end

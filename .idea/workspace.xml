@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="bdd022a2-54a0-44ae-adfc-8a4a7726587e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/256.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/265 1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/512 1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/512.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/20200722182459_29940_128.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/20200722182459_29940_16.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/20200722182459_29940_256-1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/20200722182459_29940_256.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/20200722182459_29940_32-1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/20200722182459_29940_32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/20200722182459_29940_64.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/Contents.json" beforeDir="false" afterPath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/Contents.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/icon-512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/icon-512@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/Assets.xcassets/AppIcon.appiconset/icon-513.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/FundJZWC.m" beforeDir="false" afterPath="$PROJECT_DIR$/jj/FundJZWC.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/FundModel.h" beforeDir="false" afterPath="$PROJECT_DIR$/jj/FundModel.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/FundModel.m" beforeDir="false" afterPath="$PROJECT_DIR$/jj/FundModel.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/NSMenuTableView.m" beforeDir="false" afterPath="$PROJECT_DIR$/jj/NSMenuTableView.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/ViewController.m" beforeDir="false" afterPath="$PROJECT_DIR$/jj/ViewController.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/tool/AlertTool.m" beforeDir="false" afterPath="$PROJECT_DIR$/jj/tool/AlertTool.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/tool/DataManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/jj/tool/DataManager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/tool/DataManager.m" beforeDir="false" afterPath="$PROJECT_DIR$/jj/tool/DataManager.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/tool/JTool.m" beforeDir="false" afterPath="$PROJECT_DIR$/jj/tool/JTool.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/tool/NetClient.m" beforeDir="false" afterPath="$PROJECT_DIR$/jj/tool/NetClient.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jj/tool/NetTool.m" beforeDir="false" afterPath="$PROJECT_DIR$/jj/tool/NetTool.m" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="31lshE57UPFslvreJObGze8CkDx" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/zhuanz/Desktop/z/jfc&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="bdd022a2-54a0-44ae-adfc-8a4a7726587e" name="Changes" comment="" />
+      <created>1756110110724</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1756110110724</updated>
+    </task>
+    <servers />
+  </component>
+</project>

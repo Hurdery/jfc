@@ -20,6 +20,7 @@
         self.zoneType = 1;
         
         self.f2 = [NSString stringWithFormat:@"%@",dic[@"f2"]];
+        self.f_f2 = [dic[@"f2"] floatValue];
         CGFloat ff3 = [[NSString stringWithFormat:@"%@",dic[@"f3"]] floatValue];
         CGFloat ff4 = [[NSString stringWithFormat:@"%@",dic[@"f4"]] floatValue];
 

@@ -52,6 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic,copy)NSString *f3;
 @property(nonatomic,copy)NSString *f4;
 
+@property(nonatomic,assign)float f_f2;
+
 - (instancetype)initWithDic:(NSDictionary *)dic;
 
 /// 榜单区

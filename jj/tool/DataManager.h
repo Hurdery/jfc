@@ -66,5 +66,14 @@ typedef enum : NSUInteger {
 /// 获取持仓数
 - (NSDictionary *)getInvestedMoney;
 
+/// 更新本地存取的上证极值
+-(void)updateSZ:(float)value;
+
+/// 获取本地存取的上证最大值
+- (NSString *)getRecordSZHigh;
+
+/// 获取本地存取的上证最小值
+- (NSString *)getRecordSZLow;
+
 @end
 
