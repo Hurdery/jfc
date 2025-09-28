@@ -7,8 +7,6 @@
 //
 
 #import "ViewController.h"
-#import "AlertTool.h"
-#import "FundJZWC.h"
 
 static NSColor *GreenColor(void) {
     return [NSColor colorWithDeviceRed:140 / 255.0 green:212 / 255.0 blue:144 / 255.0 alpha:1];
@@ -73,15 +71,28 @@ static NSString *const kEyeOnKey = @"eyeon";
     }];
 }
 
+#warning 肾用，刷多了，可能会封IP，无法返回正确的基金信息
 - (IBAction)autuRefreshClick:(NSButton *)sender {
-    sender.accessibilitySelected = !sender.accessibilitySelected;
-    if (sender.accessibilitySelected) {
-        sender.title = @"停止自动刷新";
-        dispatch_resume(self.timer);
-    } else {
-        sender.title = @"自动刷新";
-        dispatch_suspend(self.timer);
-    }
+    if ([sender.title isEqualToString:@"自动刷新"]) {
+           // 先弹确认框
+           [AlertTool showAlert:@"肾用，刷多了，可能会透支"
+                    actionTitle1:@"中"
+                    actionTitle2:@""
+                        window:self.view.window
+                        action:^(AlertResponse resp) {
+               if (resp == FirstResp) {
+                   sender.title = @"停止自动刷新";
+                   if (self.timer) {
+                         dispatch_resume(self.timer);
+                     }
+               }
+           }];
+       } else {
+           sender.title = @"自动刷新";
+           if (self.timer) {
+                   dispatch_suspend(self.timer);
+           }
+       }
 }
 
 - (IBAction)refreshClick:(id)sender {
@@ -92,65 +103,24 @@ static NSString *const kEyeOnKey = @"eyeon";
     sender.enabled = NO;
     self.sourceIndex = (self.sourceIndex % 3) + 1;
 
-    [self configureUIForSourceIndex:self.sourceIndex button:sender];
-
+    _st = [self updagteCurrentType:self.sourceIndex];
     [self refreshData:^{
+        [self configureUIForSourceIndex:self.sourceIndex button:sender];
         sender.enabled = YES;
     }];
 }
 
-- (void)configureUIForSourceIndex:(NSInteger)index button:(NSButton *)button {
-    // 默认状态
-    NSString *totolText = @"刮开有奖";
-    NSColor *totolColor = [NSColor lightGrayColor];
-    NSString *allMoneyText = @"清仓保平安";
-    NSColor *allMoneyColor = [NSColor lightGrayColor];
-    BOOL eyeHidden = YES;
-    BOOL updateHidden = YES;
-    BOOL codeEditable = YES;
-    NSString *placeholder = @"基码";
-    NSString *codeValue = @"";
-
-    switch (index) {
-        case 1: // 榜单区
-            _st = RankType;
-            button.title = @"榜单区";
-            eyeHidden = YES;
-            updateHidden = YES;
-            codeEditable = NO;
-            placeholder = @"\\";
-            break;
-        case 2: // 观察区
-            _st = ObType;
-            button.title = @"观察区";
-            eyeHidden = YES;
-            updateHidden = YES;
-            codeEditable = YES;
-            placeholder = @"基码";
-            break;
-        case 3: // 持有区
-        default:
-            _st = OwnType;
-            button.title = @"持有区";
-            eyeHidden = NO;
-            updateHidden = NO;
-            codeEditable = YES;
-            placeholder = @"基码";
-            break;
-    }
-
-    self.totolLabel.stringValue = totolText;
-    self.totolLabel.textColor = totolColor;
-    self.allMoneyLabel.stringValue = allMoneyText;
-    self.allMoneyLabel.textColor = allMoneyColor;
-    self.eyeBtn.hidden = eyeHidden;
-    self.updateBtn.hidden = updateHidden;
-    self.codeTf.editable = codeEditable;
-    self.codeTf.placeholderString = placeholder;
-    self.codeTf.stringValue = codeValue;
-}
-
 #pragma mark -------------------- 数据
+
+- (SourceType)updagteCurrentType:(NSInteger )index {
+    if (index == 1) {
+        return RankType;
+    } else if (index == 2) {
+        return ObType;
+    } else {
+        return OwnType;
+    }
+}
 
 - (IBAction)updateAction:(NSButton *)sender {
     NSString *curWeek = [TimeTool weekdayString];
@@ -169,26 +139,39 @@ static NSString *const kEyeOnKey = @"eyeon";
 
             __block int completedCount = 0;
             __weak typeof(self) weakSelf = self;
+            
+            __block NSMutableArray<NSString *> *failedCodes = [NSMutableArray array]; // 收集失败的基码
 
             for (NSString *code in self.ccDic.allKeys) {
                 [queue addOperationWithBlock:^{
-                    [NetTool getFundLastJZ:code resp:^(id resp) {
-                        @synchronized (weakSelf) {
-                            CGFloat currentValue = [weakSelf.ccDic[code] floatValue];
-                            CGFloat newValue = currentValue + currentValue * [resp floatValue] / 100;
-                            weakSelf.ccDic[code] = [NSString stringWithFormat:@"%.2f", newValue];
+                    [NetTool getFundLastJZ:code resp:^(id resp, NSString *errMsg) {
+                            @synchronized (weakSelf) {
+                                if (errMsg) {
+                                    [failedCodes addObject:code];
+                                } else {
+                                    CGFloat currentValue = [weakSelf.ccDic[code] floatValue];
+                                    CGFloat newValue = currentValue + currentValue * [resp floatValue] / 100;
+                                    weakSelf.ccDic[code] = [NSString stringWithFormat:@"%.2f", newValue];
+                                }
 
-                            completedCount++;
+                                completedCount++;
 
-                            if (completedCount == weakSelf.ccDic.count) {
-                                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                    [[DataManager manger] saveInvestedMoney:weakSelf.ccDic];
-                                    [weakSelf refreshData:nil];
-                                }];
+                                // 所有请求完成后统一处理
+                                if (completedCount == weakSelf.ccDic.count) {
+                                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                        [[DataManager manger] saveInvestedMoney:weakSelf.ccDic];
+                                        [weakSelf refreshData:nil]; // 刷新整个界面
+
+                                        if (failedCodes.count > 0) {
+                                            NSString *codesStr = [failedCodes componentsJoinedByString:@", "];
+                                            NSString *msg = [NSString stringWithFormat:@"以下基金获取净值失败：%@", codesStr];
+                                            [AlertTool showAlert:msg actionTitle1:@"稍后再试" actionTitle2:@"" window:[NSApplication sharedApplication].keyWindow action:nil];
+                                        }
+                                    }];
+                                }
                             }
-                        }
+                        }];
                     }];
-                }];
             }
 
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(8 * 60 * 60 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -208,7 +191,7 @@ static NSString *const kEyeOnKey = @"eyeon";
 
     dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
 
-    dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC, 0 * NSEC_PER_SEC);
+    dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 188* NSEC_PER_SEC, 0 * NSEC_PER_SEC);
 
     __weak typeof(self) weakSelf = self;
     dispatch_source_set_event_handler(timer, ^{
@@ -222,7 +205,7 @@ static NSString *const kEyeOnKey = @"eyeon";
 - (void)refreshData:(void (^)(void))isFinish {
 
     [self.indicator startAnimation:nil];
-    [[DataManager manger] loadData:_st resp:^(id _Nonnull resp) {
+    [[DataManager manger] loadData:_st resp:^(id _Nonnull resp,NSString *errMsg) {
         [self.modelsAry removeAllObjects];
         self.modelsAry = resp;
         //                NSLog(@"基数：%ld",self.modelsAry.count);
@@ -232,11 +215,19 @@ static NSString *const kEyeOnKey = @"eyeon";
         [self.indicator stopAnimation:nil];
 
         !isFinish ?: isFinish();
-
+        if (errMsg) {
+            [AlertTool showAlert:[NSString stringWithFormat:@"哎呀，搜寻基码%@出错了",errMsg] actionTitle1:@"换个基码" actionTitle2:@"" window:[NSApplication sharedApplication].keyWindow action:nil];
+        }
+        
     }];
-    [NetTool getIndexInfo:^(NSArray <FundModel *> *mArray) {
-        [self configureIndexUI:mArray];
-        [self.indicator stopAnimation:nil];
+    
+    [NetTool getIndexInfo:^(NSArray <FundModel *> *mArray,NSString *errMsg) {
+        if (errMsg) {
+            [AlertTool showAlert:@"哎呀呀，获取盘子信息出错了" actionTitle1:@"稍微一等" actionTitle2:@"" window:[NSApplication sharedApplication].keyWindow action:nil];
+        }else {
+            [self configureIndexUI:mArray];
+            [self.indicator stopAnimation:nil];
+        }
     }];
 }
 
@@ -312,7 +303,8 @@ static NSString *const kEyeOnKey = @"eyeon";
 #pragma mark --------------------------------- UI
 
 - (void)UISet {
-    self.codeTableV.delegate = (id) self;
+    
+    self.codeTableV.delegate = self;
     self.codeTableV.dataSource = self;
     self.codeTableV.mhdelegate = self;
     self.codeTableV.selectionHighlightStyle = NSTableViewSelectionHighlightStyleNone;
@@ -334,6 +326,75 @@ static NSString *const kEyeOnKey = @"eyeon";
         self.eyeBtn.accessibilitySelected = NO;
         self.eyeBtn.image = [NSImage imageNamed:@"eey"];
     }
+    
+    self.suggestionPopover = [[NSPopover alloc] init];
+    self.suggestionPopover.behavior = NSPopoverBehaviorTransient;
+    
+    NSViewController *popoverVC = [[NSViewController alloc] init];
+    NSScrollView *scrollView = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, 228, 300)];
+    
+    self.suggestionTableV = [[NSTableView alloc] initWithFrame:scrollView.bounds];
+    NSTableColumn *col = [[NSTableColumn alloc] initWithIdentifier:@"col"];
+    [col setWidth:200];
+    [self.suggestionTableV addTableColumn:col];
+    self.suggestionTableV.headerView = nil;
+    self.suggestionTableV.dataSource = self;
+    self.suggestionTableV.delegate = self;
+ 
+    scrollView.documentView = self.suggestionTableV;
+    scrollView.hasVerticalScroller = YES;
+    
+    popoverVC.view = scrollView;
+    self.suggestionPopover.contentViewController = popoverVC;
+    
+}
+
+- (void)configureUIForSourceIndex:(NSInteger)index button:(NSButton *)button {
+    // 默认状态
+    NSString *totolText = @"刮开有奖";
+    NSColor *totolColor = [NSColor lightGrayColor];
+    NSString *allMoneyText = @"清仓保平安";
+    NSColor *allMoneyColor = [NSColor lightGrayColor];
+    BOOL eyeHidden = YES;
+    BOOL updateHidden = YES;
+    BOOL codeEditable = YES;
+    NSString *placeholder = @"基码";
+    NSString *codeValue = @"";
+
+    switch (index) {
+        case 1: // 榜单区
+            button.title = @"榜单区";
+            eyeHidden = YES;
+            updateHidden = YES;
+            codeEditable = NO;
+            placeholder = @"\\";
+            break;
+        case 2: // 观察区
+            button.title = @"观察区";
+            eyeHidden = YES;
+            updateHidden = YES;
+            codeEditable = YES;
+            placeholder = @"基码";
+            break;
+        case 3: // 持有区
+        default:
+            button.title = @"持有区";
+            eyeHidden = NO;
+            updateHidden = NO;
+            codeEditable = YES;
+            placeholder = @"基码";
+            break;
+    }
+
+    self.totolLabel.stringValue = totolText;
+    self.totolLabel.textColor = totolColor;
+    self.allMoneyLabel.stringValue = allMoneyText;
+    self.allMoneyLabel.textColor = allMoneyColor;
+    self.eyeBtn.hidden = eyeHidden;
+    self.updateBtn.hidden = updateHidden;
+    self.codeTf.editable = codeEditable;
+    self.codeTf.placeholderString = placeholder;
+    self.codeTf.stringValue = codeValue;
 }
 
 - (void)configureIndexUI:(NSArray <FundModel *>*)ary {
@@ -385,17 +446,40 @@ static NSString *const kEyeOnKey = @"eyeon";
 #pragma mark -------------------- NSTableView
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
+    if (tableView == self.suggestionTableV){
+        return self.matchSuggestions.count;
+    }
     return self.modelsAry.count;
 }
 
-//设置某个元素的具体视图
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    FundModel *model = self.modelsAry[row];
-    if (model.zoneType == 2) {
-        return [self rankTableView:tableView viewForTableColumn:tableColumn row:row model:model];
-    } else {
-        return [self normalTableView:tableView viewForTableColumn:tableColumn row:row model:model];
+    if (tableView == self.suggestionTableV){
+        LocalFundModel *model = self.matchSuggestions[row];
+        return [self suggetTableView:tableView viewForTableColumn:tableColumn row:row model:model];
+    }else {
+        FundModel *model = self.modelsAry[row];
+        if (model.zoneType == 2) {
+            return [self rankTableView:tableView viewForTableColumn:tableColumn row:row model:model];
+        } else {
+            return [self normalTableView:tableView viewForTableColumn:tableColumn row:row model:model];
+        }
     }
+   
+}
+
+- (NSView *)suggetTableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row model:(LocalFundModel *)model {
+    NSTextField *cell = [tableView makeViewWithIdentifier:@"suggestCell" owner:self];
+           if (!cell) {
+               cell = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 20)];
+               cell.identifier = @"suggestCell";
+               cell.bezeled = NO;
+               cell.drawsBackground = NO;
+               cell.editable = NO;
+               cell.selectable = NO;
+           }
+    cell.stringValue = [NSString stringWithFormat:@"%@ %@",model.code,model.name];
+    [cell setToolTip:model.type];
+    return cell;
 }
 
 - (NSView *)rankTableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row model:(FundModel *)model {
@@ -496,6 +580,7 @@ static NSString *const kEyeOnKey = @"eyeon";
 #pragma mark -------------------- 拖拽
 
 - (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard {
+    if (tableView == self.suggestionTableV) return false;
     NSData *indexSetData = [NSKeyedArchiver archivedDataWithRootObject:rowIndexes requiringSecureCoding:YES error:nil];
     [pboard declareTypes:@[NSPasteboardTypeString] owner:self];
     [pboard setData:indexSetData forType:NSPasteboardTypeString];
@@ -503,6 +588,7 @@ static NSString *const kEyeOnKey = @"eyeon";
 }
 
 - (NSDragOperation)tableView:(NSTableView *)tableView validateDrop:(id <NSDraggingInfo>)info proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)dropOperation {
+    if (tableView == self.suggestionTableV) return NSDragOperationNone;
     if (dropOperation == NSTableViewDropAbove) {
         return NSDragOperationMove;
     }
@@ -510,6 +596,7 @@ static NSString *const kEyeOnKey = @"eyeon";
 }
 
 - (BOOL)tableView:(NSTableView *)tableView acceptDrop:(id <NSDraggingInfo>)info row:(NSInteger)row dropOperation:(NSTableViewDropOperation)dropOperation {
+    if (tableView == self.suggestionTableV) return false;
     NSPasteboard *pboard = [info draggingPasteboard];
     NSData *rowData = [pboard dataForType:NSPasteboardTypeString];
     NSIndexSet *rowIndexes = [NSKeyedUnarchiver unarchivedObjectOfClass:[NSIndexSet class] fromData:rowData error:nil];
@@ -560,33 +647,81 @@ static NSString *const kEyeOnKey = @"eyeon";
     }];
 }
 
+- (void)tableViewSelectionDidChange:(NSNotification *)notification {
+    NSTableView *tableView = notification.object;
+    if (tableView != self.suggestionTableV) return;
+    NSInteger row = self.suggestionTableV.selectedRow;
+    if (row < 0) return;
+
+    self.codeTf.stringValue = self.matchSuggestions[row].code;
+
+    [self.suggestionPopover close];
+    
+    if (self.codeTf.stringValue.length == 6) {
+        [self addFund:self.codeTf.stringValue];
+    }
+}
+
 #pragma mark -------------------- NSControl
 
 - (BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor {
-    //    NSLog(@"textShouldBeginEditing");
+//        NSLog(@"textShouldBeginEditing");
     return YES;
 }
 
 - (BOOL)control:(NSControl *)control textShouldEndEditing:(NSText *)fieldEditor {
     NSString *jcStr = fieldEditor.string;
-    if (control == self.codeTf) {
+    if (control == self.codeTf && jcStr.length == 6) {
         [self addFund:self.codeTf.stringValue];
-    } else {
-        FundModel *model = self.modelsAry[control.tag];
-        //    NSLog(@"control==%ld",control.tag);
-        if (jcStr.length > 0) {
-            if ([jcStr containsString:@"*"]) {
-                [AlertTool showAlert:@"不要盲输哦" actionTitle1:@"请打开金额显示" actionTitle2:@"" window:[self.view window] action:nil];
-            } else if (![JTool isPureFloat:jcStr]) {
-                [AlertTool showAlert:@"请输入正确金额[0123456789.]，伙计" actionTitle1:@"收到" actionTitle2:@"" window:[self.view window] action:nil];
-            } else {
-                [self.ccDic setValue:[NSString stringWithFormat:@"%@", jcStr] forKey:model.fundcode];
-                [[DataManager manger] saveInvestedMoney:self.ccDic];
-                [self refreshData:nil];
+    } else if (control != self.codeTf) {
+        NSInteger row = [self.codeTableV rowForView:control];
+        if (row >= 0 && row < self.modelsAry.count) {
+            FundModel *model = self.modelsAry[row];
+            if (jcStr.length > 0) {
+                if ([jcStr containsString:@"*"]) {
+                    [AlertTool showAlert:@"不要盲输哦" actionTitle1:@"请打开金额显示" actionTitle2:@"" window:[self.view window] action:nil];
+                } else if (![JTool isPureFloat:jcStr]) {
+                    [AlertTool showAlert:@"请输入正确金额[0123456789.]，伙计" actionTitle1:@"收到" actionTitle2:@"" window:[self.view window] action:nil];
+                } else {
+                    [self.ccDic setValue:[NSString stringWithFormat:@"%@", jcStr] forKey:model.fundcode];
+                    [[DataManager manger] saveInvestedMoney:self.ccDic];
+                    [self refreshData:nil];
+                }
             }
         }
     }
     return YES;
+}
+
+- (void)controlTextDidChange:(NSNotification *)notification {
+    if (notification.object != self.codeTf) return;
+    NSString *text = self.codeTf.stringValue;
+    if (text.length == 0) {
+        [self.suggestionPopover close];
+        self.matchSuggestions = @[];
+        [self.suggestionTableV reloadData];
+        return;
+    }
+
+    NSPredicate *pred = [NSPredicate predicateWithBlock:^BOOL(LocalFundModel *evaluatedObject, NSDictionary *bindings) {
+          return [evaluatedObject.code.lowercaseString hasPrefix:text.lowercaseString];
+      }];
+      self.matchSuggestions = [self.allSuggestions filteredArrayUsingPredicate:pred];
+    
+    if (self.matchSuggestions.count == 0) {
+          [self.suggestionPopover close];
+          [self.suggestionTableV reloadData];
+          return;
+      }
+    
+    [self.suggestionTableV reloadData];
+
+    if (!self.suggestionPopover.isShown) {
+        self.suggestionPopover.behavior = NSPopoverBehaviorApplicationDefined;
+        [self.suggestionPopover showRelativeToRect:self.codeTf.bounds
+                                            ofView:self.codeTf
+                                     preferredEdge:NSRectEdgeMaxY];
+    }
 }
 
 - (void)viewDidLoad {
@@ -600,6 +735,11 @@ static NSString *const kEyeOnKey = @"eyeon";
     self.sourceIndex = 1;
     self.codeTf.editable = NO;
     self.codeTf.placeholderString = @"\\";
+    
+    NSArray<LocalFundModel  *> *funds = [LocalFundParser parseFundsFromJSONFile:@"all_fund"];
+    for (LocalFundModel *f in funds) {
+        [self.allSuggestions addObject: f];
+    }
 }
 
 - (void)viewWillDisappear {
@@ -624,6 +764,13 @@ static NSString *const kEyeOnKey = @"eyeon";
 - (void)viewDidLayout {
     [super viewDidLayout];
     self.indicator.frame = CGRectMake(self.view.frame.size.width / 2 - 25, self.view.frame.size.height / 2 - 25, 50, 50);
+}
+
+- (NSMutableArray<LocalFundModel *> *)allSuggestions {
+    if (!_allSuggestions) {
+        _allSuggestions = [NSMutableArray array];
+    }
+    return _allSuggestions;
 }
 
 @end

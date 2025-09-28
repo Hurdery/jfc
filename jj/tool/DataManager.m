@@ -13,9 +13,9 @@
 #define jjMyKey @"jjMyKey"
 /// 持仓金额
 #define jcKey @"jcKey"
-
+/// 记录大盘的最高值
 #define szHighKey @"szRecordHighKey"
-
+/// 记录大盘的最低值
 #define szLowKey @"szRecordLowKey"
 
 @implementation DataManager
@@ -29,12 +29,10 @@
     return manager;
 }
 
-- (void)loadData:(SourceType)st resp:(void (^)(id resp))resp {
+- (void)loadData:(SourceType)st resp:(void (^)(id resp,NSString *errMsg))resp {
     NSArray *sourceA;
     if (st == ObType) {
-
         sourceA = [[NSUserDefaults standardUserDefaults] objectForKey:jjKey];
-
         if (sourceA.count < 1) {
             NSArray *jjA = @[@"003834", @"005968", @"006299", @"002190", @"540008", @"090018", @"001644", @"006049", @"161725", @"001951"];
             [[NSUserDefaults standardUserDefaults] setObject:jjA forKey:jjKey];
@@ -49,7 +47,6 @@
                     [resultArrM addObject:item];
                 }
             }
-
             sourceA = [NSArray arrayWithArray:resultArrM];
         }
 
@@ -67,9 +64,12 @@
 
         sourceA = [NSArray arrayWithArray:resultArrM];
     } else {
-
-        [NetTool getFundRank:^(id _Nonnull rankA) {
-            resp(rankA);
+        [NetTool getFundRank:^(id _Nonnull rankA,NSString *errMsg) {
+            if (errMsg){
+                resp(@[],errMsg);
+            } else {
+                resp(rankA,nil);
+            }
         }];
         return;
     }
@@ -79,20 +79,24 @@
     NSMutableArray *tempB = [NSMutableArray array];
     dispatch_group_t group = dispatch_group_create();
     dispatch_queue_t jjqueue = dispatch_get_global_queue(0, 0);
+    NSMutableArray *failedA = [NSMutableArray array]; // 失败的基码
 
     [sourceA enumerateObjectsUsingBlock:^(NSString *_Nonnull obj, NSUInteger idx, BOOL *_Nonnull stop) {
-
         dispatch_group_enter(group);
         dispatch_group_async(group, jjqueue, ^{
             [NetTool getFundInfo:obj complete:^(id _Nonnull resp) {
-                [tempA addObject:resp];
+                @synchronized (tempA) {
+                             [tempA addObject:resp];
+                         }
                 dispatch_group_leave(group);
 
             }               fail:^(id _Nonnull resp) {
+                @synchronized (failedA) {
+                            [failedA addObject:obj];
+                        }
                 dispatch_group_leave(group);
             }];
         });
-
     }];
 
     dispatch_group_notify(group, dispatch_get_main_queue(), ^{
@@ -108,7 +112,7 @@
 
         }];
         [self.modelsAry addObjectsFromArray:[self sortHomeModelArray:tempB]];
-        //           NSLog(@"请求完成");
+        
         if (resp) {
 
             // 可能有的基金未能查询到相关信息，请求完成之后更新本地数据，保持数据同步
@@ -117,16 +121,16 @@
                 [tempC addObject:obj.fundcode];
             }];
             if (st == ObType) {
-
                 [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:tempC] forKey:jjKey];
-
             } else if (st == OwnType) {
-
                 [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:tempC] forKey:jjMyKey];
-
             }
-
-            resp(self.modelsAry);
+            if (failedA.count > 0) {
+                NSString *codesFailStr = [failedA componentsJoinedByString:@", "];
+                resp(self.modelsAry,codesFailStr);
+            } else {
+                resp(self.modelsAry,nil);
+            }
         }
     });
 
@@ -153,9 +157,7 @@
     NSMutableArray *tempA = [NSMutableArray arrayWithArray:sourceA];
 
     [NetTool getFundInfo:codeStr complete:^(id _Nonnull resp) {
-
         if (![resp isKindOfClass:[NSError class]]) {
-
             [self.modelsAry addObject:resp];
             [tempA insertObject:codeStr atIndex:0];
             if (st == ObType) {
@@ -171,10 +173,9 @@
         } else {
             result(nil, AlertNull);
         }
-
     }
            fail:^(id _Nonnull resp) {
-
+        result(nil, AlertNull);
     }];
 }
 
@@ -202,7 +203,6 @@
 }
 
 - (NSString *)getCode:(NSInteger)row source:(SourceType)st {
-
     NSArray *sourceA;
     if (st == ObType) {
         sourceA = [[NSUserDefaults standardUserDefaults] objectForKey:jjKey];
@@ -210,7 +210,6 @@
         sourceA = [[NSUserDefaults standardUserDefaults] objectForKey:jjMyKey];
     }
     return [sourceA objectAtIndex:row];
-
 }
 
 - (void)clearData {
@@ -218,7 +217,6 @@
 }
 
 - (void)resetDefaultData:(SourceType)st resp:(void (^)(id resp))resp {
-
     if (st == ObType) {
         NSArray *jjA = @[@"003834", @"005968", @"006299", @"002190", @"540008", @"090018", @"001644", @"006049", @"161725", @"001951"];
         [[NSUserDefaults standardUserDefaults] setObject:jjA forKey:jjKey];
@@ -229,11 +227,9 @@
 
         resp(@"reset");
     }
-
 }
 
 - (NSArray *)sortHomeModelArray:(NSArray *)tempAry {
-
     NSArray *sortedArray = [tempAry sortedArrayUsingComparator:^NSComparisonResult(FundModel *obj1, FundModel *obj2) {
 
         if (obj1.sort < obj2.sort) {
@@ -242,12 +238,10 @@
             return NSOrderedDescending;
         }
     }];
-
     return sortedArray;
 }
 
 - (void)dragReset:(SourceType)st modelsAry:(NSArray *)modelsAry {
-
     NSMutableArray *tempAry = [NSMutableArray arrayWithCapacity:modelsAry.count];
 
     [modelsAry enumerateObjectsUsingBlock:^(FundModel *obj, NSUInteger idx, BOOL *_Nonnull stop) {
@@ -261,7 +255,6 @@
     } else if (st == OwnType) {
         [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:tempAry] forKey:jjMyKey];
     }
-
 }
 
 - (void)saveInvestedMoney:(NSMutableDictionary *)mdic {

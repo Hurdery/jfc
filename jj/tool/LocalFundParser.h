@@ -1,5 +1,5 @@
 //
-//  JTool.h
+//  LocalFundParser.h
 //  jj
 //
 //  Created by LY_MD on 2020/7/17.
@@ -7,13 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "LocalFundModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface JTool : NSObject
-+ (BOOL)isPureFloat:(NSString*)string;
-+ (NSDictionary *)dictionaryWithJsonString:(NSString *)jsonString;
-+ (BOOL)isEmptyArray:(id)obj;
+@interface LocalFundParser : NSObject
+
++ (NSArray<LocalFundModel *> *)parseFundsFromJSONFile:(NSString *)fileName;
+
 @end
 
 NS_ASSUME_NONNULL_END

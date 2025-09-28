@@ -25,15 +25,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 加载指数信息
 /// @param resp <#resp description#>
-+ (void)getIndexInfo:(void(^)(id resp))resp;
++ (void)getIndexInfo:(void(^)(id resp,NSString *errMsg))resp;
 
 /// 获取上一天净值
 /// @param code <#code description#>
-+ (void)getFundLastJZ:(NSString *)code resp:(void(^)(id resp))resp;
++ (void)getFundLastJZ:(NSString *)code resp:(void(^)(id resp,NSString *errMsg))resp;
 
 /// 获取排名
 /// @param resp <#resp description#>
-+ (void)getFundRank:(void(^)(id resp))resp;
++ (void)getFundRank:(void(^)(id resp,NSString *errMsg))resp;
 
 @end
 

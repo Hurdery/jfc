@@ -32,7 +32,7 @@ typedef enum : NSUInteger {
 
 /// 加载数据
 /// @param resp <#resp description#>
-- (void)loadData:(SourceType)st resp:(void(^)(id resp))resp;
+- (void)loadData:(SourceType)st resp:(void(^)(id resp,NSString *errMsg))resp;
 
 /// 添加数据
 /// @param codeStr <#codeStr description#>

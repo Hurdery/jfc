@@ -31,4 +31,7 @@
     }
     return dic;
 }
++ (BOOL)isEmptyArray:(id)obj {
+    return !(obj && [obj isKindOfClass:[NSArray class]] && [(NSArray *)obj count] > 0);
+}
 @end

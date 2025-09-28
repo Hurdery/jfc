@@ -7,16 +7,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "BCB0AE14-BBE8-4CA7-9159-09BD890FAA54"
+            uuid = "94971411-C201-4326-A842-BDF0929314DC"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "jj/tool/NetTool.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "72"
-            endingLineNumber = "72"
-            landmarkName = "+getIndexInfo:"
+            startingLineNumber = "21"
+            endingLineNumber = "21"
+            landmarkName = "+getFundInfo:complete:fail:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

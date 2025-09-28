@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B70DFAA2E6580F500CD0629 /* all_fund.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B70DFA92E6580F500CD0629 /* all_fund.json */; };
+		4BA219A42E6687CC00E035E2 /* LocalFundModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BA219A12E6687CC00E035E2 /* LocalFundModel.m */; };
+		4BA219A82E668B5400E035E2 /* LocalFundParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BA219A72E668B5400E035E2 /* LocalFundParser.m */; };
 		804BFCD524C8371F004EB109 /* AlertTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 804BFCD424C8371F004EB109 /* AlertTool.m */; };
 		804BFCDB24C85897004EB109 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 804BFCDA24C85897004EB109 /* InfoPlist.strings */; };
 		804BFCE124C8613E004EB109 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 804BFCE024C8613E004EB109 /* DataManager.m */; };
@@ -43,6 +46,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4B70DFA92E6580F500CD0629 /* all_fund.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = all_fund.json; sourceTree = "<group>"; };
+		4BA219A02E6687CC00E035E2 /* LocalFundModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalFundModel.h; sourceTree = "<group>"; };
+		4BA219A12E6687CC00E035E2 /* LocalFundModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocalFundModel.m; sourceTree = "<group>"; };
+		4BA219A62E668B5400E035E2 /* LocalFundParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalFundParser.h; sourceTree = "<group>"; };
+		4BA219A72E668B5400E035E2 /* LocalFundParser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocalFundParser.m; sourceTree = "<group>"; };
 		804BFCD324C8371F004EB109 /* AlertTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlertTool.h; sourceTree = "<group>"; };
 		804BFCD424C8371F004EB109 /* AlertTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlertTool.m; sourceTree = "<group>"; };
 		804BFCDA24C85897004EB109 /* InfoPlist.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = InfoPlist.strings; sourceTree = "<group>"; };
@@ -121,6 +129,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4BA219A92E668B5A00E035E2 /* model */ = {
+			isa = PBXGroup;
+			children = (
+				80A1287524C193C5008BD87E /* FundModel.h */,
+				80A1287624C193C5008BD87E /* FundModel.m */,
+				4BA219A02E6687CC00E035E2 /* LocalFundModel.h */,
+				4BA219A12E6687CC00E035E2 /* LocalFundModel.m */,
+			);
+			path = model;
+			sourceTree = "<group>";
+		};
 		8065780F24DD388A00A49D39 /* tool */ = {
 			isa = PBXGroup;
 			children = (
@@ -136,6 +155,8 @@
 				80E5791B26D38D090025B4BA /* NetClient.m */,
 				80E5791E26D39C910025B4BA /* JTool.h */,
 				80E5791F26D39C910025B4BA /* JTool.m */,
+				4BA219A62E668B5400E035E2 /* LocalFundParser.h */,
+				4BA219A72E668B5400E035E2 /* LocalFundParser.m */,
 			);
 			path = tool;
 			sourceTree = "<group>";
@@ -168,10 +189,10 @@
 				809A117D24EA80CA00249327 /* FundJZWC.xib */,
 				804BFD5024C9938A004EB109 /* NSMenuTableView.h */,
 				804BFD5124C9938A004EB109 /* NSMenuTableView.m */,
-				80A1287524C193C5008BD87E /* FundModel.h */,
-				80A1287624C193C5008BD87E /* FundModel.m */,
+				4BA219A92E668B5A00E035E2 /* model */,
 				8065780F24DD388A00A49D39 /* tool */,
 				80A1282D24C144C1008BD87E /* Assets.xcassets */,
+				4B70DFA92E6580F500CD0629 /* all_fund.json */,
 				80A1282F24C144C1008BD87E /* Main.storyboard */,
 				80A1283224C144C1008BD87E /* Info.plist */,
 				804BFCDA24C85897004EB109 /* InfoPlist.strings */,
@@ -299,6 +320,7 @@
 			files = (
 				809A117F24EA80CA00249327 /* FundJZWC.xib in Resources */,
 				80A1286124C18D9A008BD87E /* LICENSE in Resources */,
+				4B70DFAA2E6580F500CD0629 /* all_fund.json in Resources */,
 				804BFCDB24C85897004EB109 /* InfoPlist.strings in Resources */,
 				80A1282E24C144C1008BD87E /* Assets.xcassets in Resources */,
 				80A1286224C18D9A008BD87E /* README.md in Resources */,
@@ -333,11 +355,13 @@
 				809A117E24EA80CA00249327 /* FundJZWC.m in Sources */,
 				80E5791C26D38D090025B4BA /* NetClient.m in Sources */,
 				80A1286924C18D9A008BD87E /* UIActivityIndicatorView+AFNetworking.m in Sources */,
+				4BA219A82E668B5400E035E2 /* LocalFundParser.m in Sources */,
 				80A1287024C18D9A008BD87E /* AFNetworkReachabilityManager.m in Sources */,
 				80A1286424C18D9A008BD87E /* UIRefreshControl+AFNetworking.m in Sources */,
 				80A1283424C144C1008BD87E /* main.m in Sources */,
 				80A1282924C144BF008BD87E /* AppDelegate.m in Sources */,
 				80E5792026D39C910025B4BA /* JTool.m in Sources */,
+				4BA219A42E6687CC00E035E2 /* LocalFundModel.m in Sources */,
 				80A1286A24C18D9A008BD87E /* AFAutoPurgingImageCache.m in Sources */,
 				80A1286B24C18D9A008BD87E /* AFImageDownloader.m in Sources */,
 			);
