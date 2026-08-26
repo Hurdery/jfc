@@ -17,6 +17,17 @@ static NSColor *LightRedColor(void) {
 }
 
 static NSString *const kEyeOnKey = @"eyeon";
+static NSInteger const kHoldingAmountFieldTag = 10001;
+
+@interface ViewController ()
+
+/// 只允许最近一次刷新更新页面，避免旧请求晚返回后覆盖新数据。
+@property(nonatomic,assign) NSUInteger refreshGeneration;
+/// 记录正在请求的新基金，屏蔽同一次用户操作产生的重复添加调用。
+@property(nonatomic,strong) NSMutableSet<NSString *> *pendingFundCodes;
+
+@end
+
 
 @implementation ViewController
 
@@ -58,7 +69,23 @@ static NSString *const kEyeOnKey = @"eyeon";
 }
 
 - (void)addFund:(NSString *)code {
-    [[DataManager manger]addData:code source:_st resp:^(id  _Nonnull result, AlertType at) {
+    NSString *normalizedCode = [code stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (normalizedCode.length > 0) {
+        @synchronized (self.pendingFundCodes) {
+            // 输入框结束编辑与按钮/候选点击可能同时触发；同一批次只请求一次且不提示重复。
+            if ([self.pendingFundCodes containsObject:normalizedCode]) {
+                return;
+            }
+            [self.pendingFundCodes addObject:normalizedCode];
+        }
+    }
+
+    [[DataManager manger]addData:normalizedCode source:_st resp:^(id  _Nonnull result, AlertType at) {
+        if (normalizedCode.length > 0) {
+            @synchronized (self.pendingFundCodes) {
+                [self.pendingFundCodes removeObject:normalizedCode];
+            }
+        }
         if (at == AlertEmpty) {
             [AlertTool showAlert:@"别点了，鼠标好使！" actionTitle1:@"输入基码" actionTitle2:nil window:[self.view window] action:nil];
         } else if (at == AlertRepeat) {
@@ -69,6 +96,13 @@ static NSString *const kEyeOnKey = @"eyeon";
             [self refreshData:nil];
         }
     }];
+}
+
+- (NSMutableSet<NSString *> *)pendingFundCodes {
+    if (!_pendingFundCodes) {
+        _pendingFundCodes = [NSMutableSet set];
+    }
+    return _pendingFundCodes;
 }
 
 #warning 肾用，刷多了，可能会封IP，无法返回正确的基金信息
@@ -139,10 +173,21 @@ static NSString *const kEyeOnKey = @"eyeon";
 
             __block int completedCount = 0;
             __weak typeof(self) weakSelf = self;
-            
             __block NSMutableArray<NSString *> *failedCodes = [NSMutableArray array]; // 收集失败的基码
 
-            for (NSString *code in self.ccDic.allKeys) {
+            // 只更新当前持有区且已经填写金额的基金，历史孤立金额不会再发起请求。
+            NSMutableArray<NSString *> *codesToUpdate = [NSMutableArray array];
+            for (FundModel *model in self.modelsAry) {
+                if (self.ccDic[model.fundcode]) {
+                    [codesToUpdate addObject:model.fundcode];
+                }
+            }
+            if (codesToUpdate.count == 0) {
+                sender.enabled = YES;
+                return;
+            }
+
+            for (NSString *code in codesToUpdate) {
                 [queue addOperationWithBlock:^{
                     [NetTool getFundLastJZ:code resp:^(id resp, NSString *errMsg) {
                             @synchronized (weakSelf) {
@@ -157,7 +202,7 @@ static NSString *const kEyeOnKey = @"eyeon";
                                 completedCount++;
 
                                 // 所有请求完成后统一处理
-                                if (completedCount == weakSelf.ccDic.count) {
+                                if (completedCount == codesToUpdate.count) {
                                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                         [[DataManager manger] saveInvestedMoney:weakSelf.ccDic];
                                         [weakSelf refreshData:nil]; // 刷新整个界面
@@ -204,10 +249,17 @@ static NSString *const kEyeOnKey = @"eyeon";
 /// 刷新数据
 - (void)refreshData:(void (^)(void))isFinish {
 
+    SourceType requestSource = _st;
+    NSUInteger requestGeneration = ++self.refreshGeneration;
     [self.indicator startAnimation:nil];
-    [[DataManager manger] loadData:_st resp:^(id _Nonnull resp,NSString *errMsg) {
-        [self.modelsAry removeAllObjects];
-        self.modelsAry = resp;
+    [[DataManager manger] loadData:requestSource resp:^(id _Nonnull resp,NSString *errMsg) {
+        // 连点刷新时忽略过期批次，但仍执行调用方的结束回调，避免按钮无法恢复。
+        if (requestGeneration != self.refreshGeneration || requestSource != self->_st) {
+            !isFinish ?: isFinish();
+            return;
+        }
+        // 使用独立副本，禁止页面数组和 DataManager 返回数组互相清空。
+        self.modelsAry = [resp mutableCopy] ?: [NSMutableArray array];
         //                NSLog(@"基数：%ld",self.modelsAry.count);
         [self loadJC];
         [self.codeTableV reloadData];
@@ -216,17 +268,20 @@ static NSString *const kEyeOnKey = @"eyeon";
 
         !isFinish ?: isFinish();
         if (errMsg) {
-            [AlertTool showAlert:[NSString stringWithFormat:@"哎呀，搜寻基码%@出错了",errMsg] actionTitle1:@"换个基码" actionTitle2:@"" window:[NSApplication sharedApplication].keyWindow action:nil];
+            NSLog(@"loadData error: %@", errMsg);
         }
         
     }];
     
     [NetTool getIndexInfo:^(NSArray <FundModel *> *mArray,NSString *errMsg) {
+        if (requestGeneration != self.refreshGeneration) {
+            return;
+        }
         if (errMsg) {
-            [AlertTool showAlert:@"哎呀呀，获取盘子信息出错了" actionTitle1:@"稍微一等" actionTitle2:@"" window:[NSApplication sharedApplication].keyWindow action:nil];
+            // 两个指数源都失败时保留现有数据显示，不用弹窗打断基金操作。
+            NSLog(@"load index error: %@", errMsg);
         }else {
             [self configureIndexUI:mArray];
-            [self.indicator stopAnimation:nil];
         }
     }];
 }
@@ -543,27 +598,35 @@ static NSString *const kEyeOnKey = @"eyeon";
         NSView *view = [tableView makeViewWithIdentifier:@"cellId" owner:self];
         if (view == nil) {
             view = [[NSView alloc] initWithFrame:CGRectZero];
-            NSTextField *jct = [[NSTextField alloc] initWithFrame:CGRectMake(10, 10, 100, 20)];
+            view.identifier = @"cellId";
+        }
+
+        NSTextField *jct = (NSTextField *)[view viewWithTag:kHoldingAmountFieldTag];
+        if (![jct isKindOfClass:[NSTextField class]]) {
+            jct = [[NSTextField alloc] initWithFrame:CGRectMake(10, 10, 100, 20)];
+            jct.tag = kHoldingAmountFieldTag;
             jct.alignment = NSTextAlignmentCenter;
-
-            if (_st == ObType) {
-                jct.editable = NO;
-                jct.placeholderString = @"\\";
-            } else if (_st == OwnType) {
-                jct.editable = YES;
-                jct.delegate = self;
-                jct.tag = row;
-
-                NSString *jcStr = self.ccDic[model.fundcode];
-                BOOL eyeOn = [[NSUserDefaults standardUserDefaults] boolForKey:kEyeOnKey];
-
-                if (jcStr.length > 0) {
-                    jct.stringValue = eyeOn ? jcStr : @"******";
-                } else {
-                    jct.placeholderString = @"基金持有金额";
-                }
-            }
             [view addSubview:jct];
+        }
+
+        // 复用单元格时必须先清空，再按当前基金代码回填，禁止沿用上一行金额。
+        jct.stringValue = @"";
+        jct.placeholderString = @"";
+        jct.delegate = nil;
+        jct.editable = NO;
+        if (_st == ObType) {
+            jct.placeholderString = @"\\";
+        } else if (_st == OwnType) {
+            jct.editable = YES;
+            jct.delegate = self;
+
+            NSString *jcStr = self.ccDic[model.fundcode];
+            BOOL eyeOn = [[NSUserDefaults standardUserDefaults] boolForKey:kEyeOnKey];
+            if (jcStr.length > 0) {
+                jct.stringValue = eyeOn ? jcStr : @"******";
+            } else {
+                jct.placeholderString = @"基金持有金额";
+            }
         }
         return view;
     } else {
@@ -671,9 +734,7 @@ static NSString *const kEyeOnKey = @"eyeon";
 
 - (BOOL)control:(NSControl *)control textShouldEndEditing:(NSText *)fieldEditor {
     NSString *jcStr = fieldEditor.string;
-    if (control == self.codeTf && jcStr.length == 6) {
-        [self addFund:self.codeTf.stringValue];
-    } else if (control != self.codeTf) {
+    if (control != self.codeTf) {
         NSInteger row = [self.codeTableV rowForView:control];
         if (row >= 0 && row < self.modelsAry.count) {
             FundModel *model = self.modelsAry[row];
@@ -687,6 +748,11 @@ static NSString *const kEyeOnKey = @"eyeon";
                     [[DataManager manger] saveInvestedMoney:self.ccDic];
                     [self refreshData:nil];
                 }
+            } else if (self.ccDic[model.fundcode]) {
+                // 清空输入框等同于删除该基金的持有金额。
+                [self.ccDic removeObjectForKey:model.fundcode];
+                [[DataManager manger] saveInvestedMoney:self.ccDic];
+                [self refreshData:nil];
             }
         }
     }
@@ -717,10 +783,28 @@ static NSString *const kEyeOnKey = @"eyeon";
     [self.suggestionTableV reloadData];
 
     if (!self.suggestionPopover.isShown) {
-        self.suggestionPopover.behavior = NSPopoverBehaviorApplicationDefined;
-        [self.suggestionPopover showRelativeToRect:self.codeTf.bounds
-                                            ofView:self.codeTf
-                                     preferredEdge:NSRectEdgeMaxY];
+        // 等当前按键处理完再显示，随后同步恢复焦点，避免紧接着输入的字符被 Popover 吞掉。
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.suggestionPopover.isShown || self.codeTf.stringValue.length == 0 || self.matchSuggestions.count == 0) return;
+
+            NSText *currentEditor = self.codeTf.currentEditor;
+            NSRange selectedRange = currentEditor ? currentEditor.selectedRange : NSMakeRange(self.codeTf.stringValue.length, 0);
+            self.suggestionPopover.behavior = NSPopoverBehaviorApplicationDefined;
+            self.suggestionPopover.animates = NO;
+            [self.suggestionPopover showRelativeToRect:self.codeTf.bounds
+                                                ofView:self.codeTf
+                                         preferredEdge:NSRectEdgeMaxY];
+            [self.view.window makeKeyWindow];
+            [self.view.window makeFirstResponder:self.codeTf];
+
+            // 重新获取 Field Editor 并恢复光标，避免下一次输入替换掉已有字符。
+            NSText *restoredEditor = self.codeTf.currentEditor;
+            if (NSMaxRange(selectedRange) <= self.codeTf.stringValue.length) {
+                restoredEditor.selectedRange = selectedRange;
+            } else {
+                restoredEditor.selectedRange = NSMakeRange(self.codeTf.stringValue.length, 0);
+            }
+        });
     }
 }
 

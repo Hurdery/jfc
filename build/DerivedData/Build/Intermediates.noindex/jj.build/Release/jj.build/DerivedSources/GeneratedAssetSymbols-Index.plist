@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>colors</key>
+	<array/>
+	<key>images</key>
+	<array>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/zhuanz/Desktop/z/jfc/jj/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACImageNameDown</string>
+			<key>relativePath</key>
+			<string>./down.imageset</string>
+			<key>swiftSymbol</key>
+			<string>down</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/zhuanz/Desktop/z/jfc/jj/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACImageNameEey</string>
+			<key>relativePath</key>
+			<string>./eey.imageset</string>
+			<key>swiftSymbol</key>
+			<string>eey</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/zhuanz/Desktop/z/jfc/jj/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACImageNameEye</string>
+			<key>relativePath</key>
+			<string>./eye.imageset</string>
+			<key>swiftSymbol</key>
+			<string>eye</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/zhuanz/Desktop/z/jfc/jj/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACImageNameUp</string>
+			<key>relativePath</key>
+			<string>./up.imageset</string>
+			<key>swiftSymbol</key>
+			<string>up</string>
+		</dict>
+	</array>
+	<key>symbols</key>
+	<array/>
+</dict>
+</plist>

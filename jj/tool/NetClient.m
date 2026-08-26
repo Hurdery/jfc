@@ -16,6 +16,7 @@
     dispatch_once(&onceToken, ^{
         manager = [[self alloc] init];
         manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+        manager.requestSerializer.timeoutInterval = 5.0;
         manager.responseSerializer = [AFHTTPResponseSerializer serializer];
         [manager.responseSerializer setAcceptableContentTypes:[NSSet setWithObjects:@"application/json", @"text/json", @"text/javascript", @"text/html", @"text/plain", @"application/x-javascript", @"application/javascript", nil]];
     });
@@ -28,6 +29,7 @@
     dispatch_once(&onceToken, ^{
         manager = [[self alloc] init];
         manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+        manager.requestSerializer.timeoutInterval = 5.0;
         manager.responseSerializer = [AFJSONResponseSerializer serializer];
         [manager.responseSerializer setAcceptableContentTypes:[NSSet setWithObjects:@"application/json", @"text/json", @"text/javascript", @"text/html", @"text/plain", @"application/x-javascript", @"application/javascript",nil]];
     });

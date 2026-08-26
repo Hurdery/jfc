@@ -56,6 +56,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithDic:(NSDictionary *)dic;
 
+/// 基金基础信息接口
+/// @param dic 东方财富基金基础信息 Datas 字段
+- (instancetype)initWithBaseInfoDic:(NSDictionary *)dic;
+
 /// 榜单区
 /// @param dic <#dic description#>
 - (instancetype)initWithRankDic:(NSDictionary *)dic;

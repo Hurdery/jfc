@@ -10,6 +10,15 @@
 
 @implementation FundModel
 
+/// 将接口中的空值统一转成占位符，避免表格给 stringValue 传入 nil。
+static NSString *FundDisplayString(id value) {
+    if (!value || value == [NSNull null]) {
+        return @"--";
+    }
+    NSString *string = [NSString stringWithFormat:@"%@", value];
+    return string.length > 0 ? string : @"--";
+}
+
 - (instancetype)initWithDic:(NSDictionary *)dic{
     if (self = [super init]) {
         self.name = dic[@"name"];
@@ -30,6 +39,27 @@
         self.gszzl = [[NSString stringWithFormat:@"%.2f",gz]stringByAppendingString:@"%"];
     }
     
+    return self;
+}
+
+- (instancetype)initWithBaseInfoDic:(NSDictionary *)dic {
+    if (self = [super init]) {
+        self.name = FundDisplayString(dic[@"SHORTNAME"]);
+        self.fundcode = FundDisplayString(dic[@"FCODE"]);
+        self.dwjz = FundDisplayString(dic[@"DWJZ"]);
+        self.jzrq = FundDisplayString(dic[@"FSRQ"]);
+
+        // 盘中估值不可用时仅隐藏估值；正式日涨幅和净值日期仍应正常展示。
+        self.gsz = @"--";
+        NSString *dailyChange = FundDisplayString(dic[@"RZDF"]);
+        if ([dailyChange isEqualToString:@"--"]) {
+            self.gszzl = dailyChange;
+        } else {
+            self.gszzl = [[NSString stringWithFormat:@"%.2f", dailyChange.floatValue] stringByAppendingString:@"%"];
+        }
+        self.gztime = self.jzrq;
+        self.zoneType = 1;
+    }
     return self;
 }
 

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>logFormatVersion</key>
+	<integer>11</integer>
+	<key>logs</key>
+	<dict>
+		<key>8B58372C-A272-4B4E-8E2C-18629617C4D4</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>8B58372C-A272-4B4E-8E2C-18629617C4D4.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>jj project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>jj</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Cleaning project jj with scheme jj and configuration Release</string>
+			<key>timeStartedRecording</key>
+			<real>809347772.61918902</real>
+			<key>timeStoppedRecording</key>
+			<real>809347772.90761495</real>
+			<key>title</key>
+			<string>Cleaning project jj with scheme jj and configuration Release</string>
+			<key>uniqueIdentifier</key>
+			<string>8B58372C-A272-4B4E-8E2C-18629617C4D4</string>
+		</dict>
+		<key>B1DA81A1-0972-4989-A83D-963A35A58A5F</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>B1DA81A1-0972-4989-A83D-963A35A58A5F.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>W</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>14</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>jj project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>jj</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project jj with scheme jj and configuration Release</string>
+			<key>timeStartedRecording</key>
+			<real>809347772.909953</real>
+			<key>timeStoppedRecording</key>
+			<real>809347780.64050698</real>
+			<key>title</key>
+			<string>Building project jj with scheme jj and configuration Release</string>
+			<key>uniqueIdentifier</key>
+			<string>B1DA81A1-0972-4989-A83D-963A35A58A5F</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

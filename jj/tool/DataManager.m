@@ -18,6 +18,13 @@
 /// 记录大盘的最低值
 #define szLowKey @"szRecordLowKey"
 
+@interface DataManager ()
+
+/// 标记最近一次加载，避免并发刷新完成顺序不同导致共享数据回退。
+@property(nonatomic,assign) NSUInteger loadGeneration;
+
+@end
+
 @implementation DataManager
 
 + (instancetype)manger {
@@ -25,11 +32,14 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         manager = [[DataManager alloc] init];
+        // 启动即清理历史孤立金额，不依赖用户先切换到持有区。
+        [manager getInvestedMoney];
     });
     return manager;
 }
 
 - (void)loadData:(SourceType)st resp:(void (^)(id resp,NSString *errMsg))resp {
+    NSUInteger requestGeneration = ++self.loadGeneration;
     NSArray *sourceA;
     if (st == ObType) {
         sourceA = [[NSUserDefaults standardUserDefaults] objectForKey:jjKey];
@@ -74,12 +84,10 @@
         return;
     }
 
-    self.modelsAry = [NSMutableArray array];
     NSMutableArray *tempA = [NSMutableArray array];
     NSMutableArray *tempB = [NSMutableArray array];
     dispatch_group_t group = dispatch_group_create();
     dispatch_queue_t jjqueue = dispatch_get_global_queue(0, 0);
-    NSMutableArray *failedA = [NSMutableArray array]; // 失败的基码
 
     [sourceA enumerateObjectsUsingBlock:^(NSString *_Nonnull obj, NSUInteger idx, BOOL *_Nonnull stop) {
         dispatch_group_enter(group);
@@ -91,9 +99,11 @@
                 dispatch_group_leave(group);
 
             }               fail:^(id _Nonnull resp) {
-                @synchronized (failedA) {
-                            [failedA addObject:obj];
-                        }
+                // 单只基金失败时仍保留这一行，避免一次失败影响整张列表。
+                FundModel *placeholder = [[FundModel alloc] initWithBaseInfoDic:@{@"FCODE": obj}];
+                @synchronized (tempA) {
+                    [tempA addObject:placeholder];
+                }
                 dispatch_group_leave(group);
             }];
         });
@@ -111,26 +121,21 @@
             }];
 
         }];
-        [self.modelsAry addObjectsFromArray:[self sortHomeModelArray:tempB]];
-        
-        if (resp) {
+        // 每一批刷新使用独立结果，不能写入其他并发请求正在使用的数组。
+        NSArray *resultModels = [[self sortHomeModelArray:tempB] copy];
+        if (requestGeneration == self.loadGeneration) {
+            self.modelsAry = [resultModels mutableCopy];
 
-            // 可能有的基金未能查询到相关信息，请求完成之后更新本地数据，保持数据同步
-            NSMutableArray *tempC = [NSMutableArray array];
-            [self.modelsAry enumerateObjectsUsingBlock:^(FundModel *_Nonnull obj, NSUInteger idx, BOOL *_Nonnull stop) {
-                [tempC addObject:obj.fundcode];
-            }];
+            // 只有最新批次可以写本地列表，防止旧刷新覆盖刚完成的新增或删除。
             if (st == ObType) {
-                [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:tempC] forKey:jjKey];
+                [[NSUserDefaults standardUserDefaults] setObject:sourceA forKey:jjKey];
             } else if (st == OwnType) {
-                [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:tempC] forKey:jjMyKey];
+                [[NSUserDefaults standardUserDefaults] setObject:sourceA forKey:jjMyKey];
             }
-            if (failedA.count > 0) {
-                NSString *codesFailStr = [failedA componentsJoinedByString:@", "];
-                resp(self.modelsAry,codesFailStr);
-            } else {
-                resp(self.modelsAry,nil);
-            }
+        }
+
+        if (resp) {
+            resp(resultModels,nil);
         }
     });
 
@@ -163,6 +168,11 @@
             if (st == ObType) {
                 [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:tempA] forKey:jjKey];
             } else if (st == OwnType) {
+                // 新加入持有区的基金从空金额开始，不能继承以前删除后残留的数据。
+                NSMutableDictionary *investedMoney = [[self getInvestedMoney] mutableCopy];
+                investedMoney = investedMoney ?: [NSMutableDictionary dictionary];
+                [investedMoney removeObjectForKey:codeStr];
+                [self saveInvestedMoney:investedMoney];
                 [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:tempA] forKey:jjMyKey];
             }
 
@@ -189,6 +199,10 @@
         sourceA = [[NSUserDefaults standardUserDefaults] objectForKey:jjMyKey];
     }
 
+    if (row < 0 || row >= sourceA.count) {
+        return;
+    }
+    NSString *removedCode = sourceA[row];
     NSMutableArray *mjja = [NSMutableArray arrayWithArray:sourceA];
     [mjja removeObjectAtIndex:row];
 
@@ -196,6 +210,11 @@
         [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:mjja] forKey:jjKey];
     } else if (st == OwnType) {
         [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:mjja] forKey:jjMyKey];
+        // 删除持有基金时同步删除金额，避免以后重新添加时出现历史金额。
+        NSMutableDictionary *investedMoney = [[self getInvestedMoney] mutableCopy];
+        investedMoney = investedMoney ?: [NSMutableDictionary dictionary];
+        [investedMoney removeObjectForKey:removedCode];
+        [self saveInvestedMoney:investedMoney];
     }
     [[NSUserDefaults standardUserDefaults] synchronize];
 
@@ -262,7 +281,23 @@
 }
 
 - (NSDictionary *)getInvestedMoney {
-    return [[NSUserDefaults standardUserDefaults] objectForKey:jcKey];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSDictionary *savedMoney = [defaults objectForKey:jcKey];
+    NSArray<NSString *> *ownedCodes = [defaults objectForKey:jjMyKey];
+    NSMutableDictionary *validMoney = [NSMutableDictionary dictionary];
+
+    // 金额只允许属于当前持有区，自动清理已经删除基金留下的孤立数据。
+    for (NSString *code in ownedCodes) {
+        id amount = savedMoney[code];
+        if (amount) {
+            validMoney[code] = amount;
+        }
+    }
+    if (![validMoney isEqualToDictionary:savedMoney ?: @{}]) {
+        [defaults setObject:validMoney forKey:jcKey];
+        [defaults synchronize];
+    }
+    return [validMoney copy];
 }
 
 - (void)updateSZ:(float)value {
